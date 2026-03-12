@@ -1,8 +1,6 @@
 #ifndef STUDENT_H
 #define STUDENT_H
 
-#include <time.h>
-
 typedef struct{
     int series;
     int number;
@@ -13,7 +11,9 @@ typedef struct{
     char* firstName;
     char* secondName;
     char* lastName;
-    time_t dateBirth;
+    int dayStudentBirth;
+    int monthStudentBirth;
+    int yearStudentBirth;
     int scholarship;
 } Student;
 
@@ -25,7 +25,7 @@ typedef struct{
 void initStudentList(StudentArray* arr);
 void addStudent(StudentArray* arr, char* firstName,
                 char* secondName, char* lastName,
-                time_t dateBirth, Student_ID* ID,
+                int dayStudentBirth, int monthStudentBirth, int yearStudentBirth, Student_ID* ID,
                 int scholarship);
 void removeStudent(StudentArray* arr, int index);
 void freeStudentArray(StudentArray* arr);

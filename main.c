@@ -10,6 +10,11 @@
 StudentArray students;
 TeacherArray teachers;
 
+void clearInputBuffer(){
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
 void printmenu(){
     printf(
         "========МЕНЮ=======\n"
@@ -35,46 +40,49 @@ void inputPassportID(Person_ID* id){
     printf("  [2] - В одну строку через пробел\n");
     printf("Выбор: ");
     scanf("%d", &format);
+    clearInputBuffer();
 
         if(format == 1){
             printf("Введите серию паспорта: ");
             scanf("%d", &id->series);
+            clearInputBuffer();
             printf("Введите номер паспорта: ");
             scanf("%d", &id->number);
+            clearInputBuffer();
         }
         else if(format == 2){
             printf("Введите серию и номер через пробел: ");
             scanf("%d %d", &id->series, &id->number);
+            clearInputBuffer();
         }
         else{
             printf("Неверный выбор, используется формат по умолчанию (отдельно).\n");
             printf("Введите серию паспорта: ");
             scanf("%d", &id->series);
+            clearInputBuffer();
             printf("Введите номер паспорта: ");
             scanf("%d", &id->number);
+            clearInputBuffer();
         }
-}
-
-time_t inputDateOfBirth(){
-    int day, month, year;
-    printf("Введите дату рождения (день месяц год): ");
-    scanf("%d %d %d", &day, &month, &year);
-    return mktime(&(struct tm){year-1900, month-1, day, 0, 0, 0, 0, 0, -1});
 }
 
 void inputFullName(char* firstName, char* secondName, char* lastName){
     printf("Введите имя: ");
-    scanf("%s", firstName);
+    scanf("%49s", firstName);
+    clearInputBuffer();
     printf("Введите отчество: ");
-    scanf("%s", secondName);
+    scanf("%49s", secondName);
+    clearInputBuffer();
     printf("Введите фамилию: ");
-    scanf("%s", lastName);
+    scanf("%49s", lastName);
+    clearInputBuffer();
 }
 
 int main(void){
     int choice = 1;
     char firstName[50], secondName[50], lastName[50];
-    time_t dateBirth;
+    int dayStudentBirth = 0, monthStudentBirth = 0, yearStudentBirth = 0;
+    int dayTeacherBirth = 0, monthTeacherBirth = 0, yearTeacherBirth = 0;
     int salary, scholarship;
     int index;
     Person_ID id;
@@ -84,17 +92,21 @@ int main(void){
     while(choice != 0){
         printmenu();
         scanf("%d",&choice);
+        clearInputBuffer();
         switch (choice){
 
         case 1:{
             printf("\n--- Добавление преподавателя ---\n");
             inputPassportID(&id);
             inputFullName(firstName, secondName, lastName);
-            dateBirth = inputDateOfBirth();
+            printf("Введите дату рождения (день месяц год P.S. через пробел в формате XX XX XXXX): ");
+            scanf("%d %d %d", &dayTeacherBirth, &monthTeacherBirth, &yearTeacherBirth);
+            clearInputBuffer();
             printf("Введите зарплату: ");
             scanf("%d", &salary);
+            clearInputBuffer();
 
-            addTeacher(&teachers, firstName, secondName, lastName, dateBirth, (Teacher_ID*)&id, salary);
+            addTeacher(&teachers, firstName, secondName, lastName, dayTeacherBirth, monthTeacherBirth, yearTeacherBirth, (Teacher_ID*)&id, salary);
             printf("Преподаватель добавлен.\n\n");
             break;
         }
@@ -103,11 +115,14 @@ int main(void){
             printf("\n--- Добавление студента ---\n");
             inputPassportID(&id);
             inputFullName(firstName, secondName, lastName);
-            dateBirth = inputDateOfBirth();
+            printf("Введите дату рождения (день месяц год P.S. через пробел в формате XX XX XXXX): ");
+            scanf("%d %d %d", &dayStudentBirth, &monthStudentBirth, &yearStudentBirth);
+            clearInputBuffer();
             printf("Введите стипендию: ");
             scanf("%d", &scholarship);
+            clearInputBuffer();
 
-            addStudent(&students, firstName, secondName, lastName, dateBirth, (Student_ID*)&id, scholarship);
+            addStudent(&students, firstName, secondName, lastName, dayStudentBirth, monthStudentBirth, yearStudentBirth, (Student_ID*)&id, scholarship);
             printf("Студент добавлен.\n\n");
             break;
         }
@@ -115,6 +130,7 @@ int main(void){
         case 3:{
             printf("\nВведите индекс преподавателя для удаления: ");
             scanf("%d", &index);
+            clearInputBuffer();
             removeTeacher(&teachers, index - 1);
             printf("\n");
             break;
@@ -123,6 +139,7 @@ int main(void){
         case 4:{
             printf("\nВведите индекс студента для удаления: ");
             scanf("%d", &index);
+            clearInputBuffer();
             removeStudent(&students, index - 1);
             printf("\n");
             break;

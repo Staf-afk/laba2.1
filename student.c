@@ -10,7 +10,7 @@ void initStudentList(StudentArray* arr){
 
 void addStudent(StudentArray* arr, char* firstName, 
                 char* secondName, char* lastName, 
-                time_t dateBirth, Student_ID* ID,
+                int dayStudentBirth, int monthStudentBirth, int yearStudentBirth, Student_ID* ID,
                 int scholarship){
     Student* newData = (Student*)realloc(arr->data, (arr->size + 1) * sizeof(Student));
     if (newData == NULL){
@@ -22,7 +22,9 @@ void addStudent(StudentArray* arr, char* firstName,
     arr->data[arr->size].firstName = strdup(firstName);
     arr->data[arr->size].secondName = strdup(secondName);
     arr->data[arr->size].lastName = strdup(lastName);
-    arr->data[arr->size].dateBirth = dateBirth;
+    arr->data[arr->size].dayStudentBirth = dayStudentBirth;
+    arr->data[arr->size].monthStudentBirth = monthStudentBirth;
+    arr->data[arr->size].yearStudentBirth = yearStudentBirth;
     arr->data[arr->size].id = *ID;
     arr->data[arr->size].scholarship = scholarship;
     
@@ -81,7 +83,8 @@ void freeStudentArray(StudentArray* arr){
 
 void printStudent(Student* t) {
     if (!t) return;
-    printf("  [Cтудент] %s %s %s | Стипендия: %d | Дата рождения: %ld\n", t->lastName, t->firstName, t->secondName, t->scholarship, (long)t->dateBirth);
+    printf("  [Cтудент] %s %s %s | Стипендия: %d | Дата рождения: %d.%d.%d\n", t->lastName, t->firstName, 
+        t->secondName, t->scholarship, t->dayStudentBirth,t->monthStudentBirth, t->yearStudentBirth);
 }
 
 void printAllStudents(StudentArray* arr) {

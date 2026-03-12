@@ -10,7 +10,7 @@ void initTeacherList(TeacherArray* arr){
 
 void addTeacher(TeacherArray* arr, char* firstName,
                 char* secondName, char* lastName,
-                time_t dateBirth, Teacher_ID* ID,
+                int dayTeacherBirth, int monthTeacherBirth, int yearTeacherBirth, Teacher_ID* ID,
                 int salary){
     Teacher* newData = (Teacher*)realloc(arr->data, (arr->size + 1) * sizeof(Teacher));
     if (newData == NULL){
@@ -22,7 +22,9 @@ void addTeacher(TeacherArray* arr, char* firstName,
     arr->data[arr->size].firstName = strdup(firstName);
     arr->data[arr->size].secondName = strdup(secondName);
     arr->data[arr->size].lastName = strdup(lastName);
-    arr->data[arr->size].dateBirth = dateBirth;
+    arr->data[arr->size].dayTeacherBirth = dayTeacherBirth;
+    arr->data[arr->size].monthTeacherBirth = monthTeacherBirth;
+    arr->data[arr->size].yearTeacherBirth = yearTeacherBirth;
     arr->data[arr->size].id = *ID;
     arr->data[arr->size].salary = salary;
 
@@ -79,8 +81,8 @@ void freeTeacherArray(TeacherArray* arr) {
 
 void printTeacher(Teacher* t) {
     if (!t) return;
-    printf("  [Преподаватель] %s %s %s | ЗП: %d | Дата рождения: %ld\n",
-           t->lastName, t->firstName, t->secondName, t->salary, (long)t->dateBirth);
+    printf("  [Преподаватель] %s %s %s | ЗП: %d | Дата рождения: %d.%d.%d\n",
+           t->lastName, t->firstName, t->secondName, t->salary, t->dayTeacherBirth, t->monthTeacherBirth, t->yearTeacherBirth);
 }
 
 void printAllTeachers(TeacherArray* arr) {

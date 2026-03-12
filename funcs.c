@@ -12,7 +12,7 @@ int addPrefixToStudentName(Student* s) {
     if (!s || !s->firstName) return 0;
     char* newFirst = malloc(strlen(s->firstName) + 4);
     if (!newFirst) return 0;
-    sprintf(newFirst, "[?] %s", s->firstName);
+    sprintf(newFirst, "[префикс] %s", s->firstName);
     free(s->firstName);
     s->firstName = newFirst;
     return 1;
@@ -22,7 +22,7 @@ int addPrefixToTeacherName(Teacher* t) {
     if (!t || !t->firstName) return 0;
     char* newFirst = malloc(strlen(t->firstName) + 4);
     if (!newFirst) return 0;
-    sprintf(newFirst, "[?] %s", t->firstName);
+    sprintf(newFirst, "[префикс] %s", t->firstName);
     free(t->firstName);
     t->firstName = newFirst;
     return 1;
@@ -111,30 +111,17 @@ Teacher* findTeacherByID(TeacherArray* arr, int series, int number) {
     return NULL;
 }
 
-void* findPersonByID(void* arr, PersonType type, int series, int number){
-    if (!arr) return NULL;
-
-    if (type == TYPE_STUDENT){
-        StudentArray* sArr = (StudentArray*)arr;
-        if (!sArr->data) 
-        return NULL;
-
-        for (int i = 0; i < sArr->size; i++) {
-            if (sArr->data[i].id.series == series && sArr->data[i].id.number == number){
-                return &sArr->data[i];
-            }
-        }
-    } 
-    else if (type == TYPE_TEACHER){
-        TeacherArray* tArr = (TeacherArray*)arr;
-        if (!tArr->data) 
-        return NULL;
-
-        for (int i = 0; i < tArr->size; i++){
-            if (tArr->data[i].id.series == series && tArr->data[i].id.number == number){
-                return &tArr->data[i];
-            }
-        }
+void findPersonByID(StudentArray* students, TeacherArray* teachers, int series, int number){
+    Student* s = findStudentByID(students, series, number);
+    Teacher* t = findTeacherByID(teachers, series, number);
+    
+    if (s) {
+        printf("Найден студент:\n");
+        printStudent(s);
+    } else if (t) {
+        printf("Найден преподаватель:\n");
+        printTeacher(t);
+    } else {
+        printf("Человек с таким паспортом не найден.\n");
     }
-    return NULL;
 }

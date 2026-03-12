@@ -19,5 +19,4 @@ StudentArray* mapStudents(StudentArray* arr, int (*mapper)(Student*));
 TeacherArray* mapTeachers(TeacherArray* arr, int (*mapper)(Teacher*));
 void concatPrint(StudentArray* students, TeacherArray* teachers);
 void findPersonByID(StudentArray* students, TeacherArray* teachers, int series, int number);
-
 #endif
