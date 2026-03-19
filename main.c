@@ -2,23 +2,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "tests.h"
-#include "teacher.h"
+#include "person.h"
 #include "student.h"
+#include "teacher.h"
 #include "funcs.h"
-#include "passport.h"
 
-StudentArray students;
-TeacherArray teachers;
+PersonArray people;
 
-// Добавлена функция очистки буфера ввода
-void clearInputBuffer(void) {
+void clearInputBuffer(void){
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-// Добавлена функция выбора формата паспорта
-void selectPassportFormat(void) {
+void selectPassportFormat(void){
     int choice;
     printf("Выберите формат паспорта:\n");
     printf("[1] - Серия и номер (раздельно)\n");
@@ -28,44 +24,47 @@ void selectPassportFormat(void) {
     scanf("%d", &choice);
     clearInputBuffer();
     
-    if (choice == 1) {
+    if (choice == 1){
         setPassportFormat(FORMAT_STRUCTURE);
-    } else if (choice == 2) {
+    }
+    else if (choice == 2){
         setPassportFormat(FORMAT_SINGLE_NUMBER);
-    } else {
+    }
+    else{
         setPassportFormat(FORMAT_SPACE_SEPARATED);
     }
 }
 
-void printmenu(void) {
+void printmenu(void){
     printf(
         "========МЕНЮ=======\n"
         "[1] - Добавить преподавателя.\n"
         "[2] - Добавить студента.\n"
-        "[3] - Удалить преподавателя.\n"
-        "[4] - Удалить студента.\n"
-        "[5] - Найти человека по ID.\n"
-        "[6] - Вывести список студентов.\n"
-        "[7] - Вывести список преподавателей.\n"
-        "[8] - Вывести всех.\n"
-        "[9] - Добавить префикс к именам.\n"
-        "[10] - Запустить тесты.\n"
+        "[3] - Удалить человека.\n"
+        "[4] - Найти человека по ID.\n"
+        "[5] - Вывести список студентов.\n"
+        "[6] - Вывести список преподавателей.\n"
+        "[7] - Вывести всех.\n"
+        "[8] - Добавить префикс к именам.\n"
+        "[9] - Запустить тесты.\n"
         "[0] - Завершить программу.\n"
         "Выбор: "
     );
 }
 
-void inputPassportID(Person_ID* id) {
-    if (g_passportFormat == FORMAT_SINGLE_NUMBER) {
+void inputPassportID(Person_ID* id){
+    if (g_passportFormat == FORMAT_SINGLE_NUMBER){
         printf("Введите уникальный ID паспорта: ");
         scanf("%d", &id->series);
         id->number = 0;
         clearInputBuffer();
-    } else if (g_passportFormat == FORMAT_SPACE_SEPARATED) {
+    }
+    else if (g_passportFormat == FORMAT_SPACE_SEPARATED){
         printf("Введите серию и номер через пробел: ");
         scanf("%d %d", &id->series, &id->number);
         clearInputBuffer();
-    } else {
+    }
+    else{
         printf("Введите серию паспорта: ");
         scanf("%d", &id->series);
         clearInputBuffer();
@@ -75,7 +74,7 @@ void inputPassportID(Person_ID* id) {
     }
 }
 
-void inputFullName(char* firstName, char* secondName, char* lastName) {
+void inputFullName(char* firstName, char* secondName, char* lastName){
     printf("Введите имя: ");
     scanf("%49s", firstName);
     clearInputBuffer();
@@ -87,39 +86,41 @@ void inputFullName(char* firstName, char* secondName, char* lastName) {
     clearInputBuffer();
 }
 
-int main(void) {
+int main(void){
     int choice = 1;
     char firstName[50], secondName[50], lastName[50];
-    int dayStudentBirth = 0, monthStudentBirth = 0, yearStudentBirth = 0;
-    int dayTeacherBirth = 0, monthTeacherBirth = 0, yearTeacherBirth = 0;
+    int dayBirth = 0, monthBirth = 0, yearBirth = 0;
     int salary, scholarship;
     int index;
     Person_ID id;
     
     selectPassportFormat();
-    initStudentList(&students);
-    initTeacherList(&teachers);
+    initPersonList(&people);
     
-    while (choice != 0) {
+    while (choice != 0){
         printmenu();
         scanf("%d", &choice);
         clearInputBuffer();
         
-        switch (choice) {
+        switch (choice){
             case 1: {
                 printf("\n--- Добавление преподавателя ---\n");
                 inputPassportID(&id);
                 inputFullName(firstName, secondName, lastName);
                 printf("Введите дату рождения (день месяц год): ");
-                scanf("%d %d %d", &dayTeacherBirth, &monthTeacherBirth, &yearTeacherBirth);
+                scanf("%d %d %d", &dayBirth, &monthBirth, &yearBirth);
                 clearInputBuffer();
                 printf("Введите зарплату: ");
                 scanf("%d", &salary);
                 clearInputBuffer();
-                addTeacher(&teachers, firstName, secondName, lastName,
-                          dayTeacherBirth, monthTeacherBirth, yearTeacherBirth,
-                          (Teacher_ID*)&id, salary);
-                printf("Преподаватель добавлен.\n");
+                
+                Teacher* t = createTeacher(firstName, secondName, lastName,
+                                          dayBirth, monthBirth, yearBirth,
+                                          &id, salary);
+                if (t){
+                    addPerson(&people, (PersonBase*)t);
+                    printf("Преподаватель добавлен.\n");
+                }
                 break;
             }
             case 2: {
@@ -127,79 +128,83 @@ int main(void) {
                 inputPassportID(&id);
                 inputFullName(firstName, secondName, lastName);
                 printf("Введите дату рождения (день месяц год): ");
-                scanf("%d %d %d", &dayStudentBirth, &monthStudentBirth, &yearStudentBirth);
+                scanf("%d %d %d", &dayBirth, &monthBirth, &yearBirth);
                 clearInputBuffer();
                 printf("Введите стипендию: ");
                 scanf("%d", &scholarship);
                 clearInputBuffer();
-                addStudent(&students, firstName, secondName, lastName,
-                          dayStudentBirth, monthStudentBirth, yearStudentBirth,
-                          (Student_ID*)&id, scholarship);
-                printf("Студент добавлен.\n");
+                
+                Student* s = createStudent(firstName, secondName, lastName,
+                                          dayBirth, monthBirth, yearBirth,
+                                          &id, scholarship);
+                if (s){
+                    addPerson(&people, (PersonBase*)s);
+                    printf("Студент добавлен.\n");
+                }
                 break;
             }
             case 3: {
-                printf("\nВведите индекс преподавателя для удаления: ");
+                printf("\nВведите индекс человека для удаления: ");
                 scanf("%d", &index);
                 clearInputBuffer();
-                removeTeacher(&teachers, index - 1);
+                removePerson(&people, index - 1);
                 printf("\n");
                 break;
             }
             case 4: {
-                printf("\nВведите индекс студента для удаления: ");
-                scanf("%d", &index);
-                clearInputBuffer();
-                removeStudent(&students, index - 1);
-                printf("\n");
-                break;
-            }
-            case 5: {
                 printf("\n--- Поиск по паспортным данным ---\n");
                 inputPassportID(&id);
-                findPersonByID(&students, &teachers, id.series, id.number);
+                PersonBase* p = findPersonByID(&people, id.series, id.number);
+                if (p){
+                    printf("Найден:\n");
+                    printPerson(p);
+                }
+                else{
+                    printf("Человек с таким паспортом не найден.\n");
+                }
                 printf("\n");
                 break;
             }
-            case 6:
+            case 5:{
                 printf("\n");
-                printAllStudents(&students);
-                printf("\n");
-                break;
-            case 7:
-                printf("\n");
-                printAllTeachers(&teachers);
+                printStudentsOnly(&people);
                 printf("\n");
                 break;
-            case 8:
+            }
+            case 6:{
                 printf("\n");
-                concatPrint(&students, &teachers);
+                printTeachersOnly(&people);
                 printf("\n");
                 break;
-            case 9: {
-                StudentArray* mappedStudents = mapStudents(&students, addPrefixToStudentName);
-                TeacherArray* mappedTeachers = mapTeachers(&teachers, addPrefixToTeacherName);
+            }
+            case 7:{
+                printf("\n");
+                concatPrint(&people);
+                printf("\n");
+                break;
+            }
+            case 8: {
+                PersonArray* mapped = mapPersons(&people, addPrefixToPersonName);
                 printf("\nПрефикс добавлен к именам.\n");
-                concatPrint(mappedStudents, mappedTeachers);
-                freeStudentArray(mappedStudents);
-                freeTeacherArray(mappedTeachers);
-                free(mappedStudents);
-                free(mappedTeachers);
+                concatPrint(mapped);
+                freePersonArray(mapped);
+                free(mapped);
                 printf("\n");
                 break;
             }
-            case 10:
-                runAllTests();
+            case 9:{
                 printf("\nТесты запущены.\n");
                 break;
-            case 0:
+            }
+            case 0:{
                 printf("Завершение работы.\n");
-                freeStudentArray(&students);
-                freeTeacherArray(&teachers);
+                freePersonArray(&people);
                 break;
-            default:
+            }
+            default:{
                 printf("Неверный выбор.\n");
                 break;
+            }
         }
     }
     return 0;

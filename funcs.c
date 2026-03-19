@@ -2,147 +2,120 @@
 #include <stdlib.h>
 #include <string.h>
 #include "funcs.h"
-#include "passport.h"
 
-typedef enum {
-    TYPE_STUDENT = 1,
-    TYPE_TEACHER = 2
-} PersonType;
-
-int addPrefixToStudentName(Student* s) {
-    if (!s || !s->firstName) return 0;
-    char* newFirst = malloc(strlen(s->firstName) + 17);
+int addPrefixToPersonName(PersonBase* p){
+    if (!p || !p->firstName) return 0;
+    char* newFirst = malloc(strlen(p->firstName) + 17);
     if (!newFirst) return 0;
-    sprintf(newFirst, "[префикс] %s", s->firstName);
-    free(s->firstName);
-    s->firstName = newFirst;
+    sprintf(newFirst, "[префикс] %s", p->firstName);
+    free(p->firstName);
+    p->firstName = newFirst;
     return 1;
 }
 
-int addPrefixToTeacherName(Teacher* t) {
-    if (!t || !t->firstName) return 0;
-    char* newFirst = malloc(strlen(t->firstName) + 17);
-    if (!newFirst) return 0;
-    sprintf(newFirst, "[префикс] %s", t->firstName);
-    free(t->firstName);
-    t->firstName = newFirst;
-    return 1;
-}
-
-StudentArray* mapStudents(StudentArray* arr, int (*mapper)(Student*)) {
+PersonArray* mapPersons(PersonArray* arr, int (*mapper)(PersonBase*)){
     if (!arr || !mapper) return NULL;
-    StudentArray* result = malloc(sizeof(StudentArray));
+    
+    PersonArray* result = malloc(sizeof(PersonArray));
     if (!result) return NULL;
-    initStudentList(result);
+    initPersonList(result);
     
-    if (arr->size > 0) {
-        result->data = malloc(arr->size * sizeof(Student));
-        if (!result->data) { 
-            free(result); 
-            return NULL; 
+    for (int i = 0; i < arr->size; i++){
+        PersonBase* original = arr->data[i];
+        PersonBase* copy = NULL;
+        
+        if (isStudent(original)){
+            Student* s = (Student*)original;
+            copy = (PersonBase*)createStudent(
+                original->firstName, original->secondName, original->lastName,
+                original->dayBirth, original->monthBirth, original->yearBirth,
+                &original->id, s->scholarship
+            );
         }
-    } else {
-        result->data = NULL;
+        else if (isTeacher(original)){
+            Teacher* t = (Teacher*)original;
+            copy = (PersonBase*)createTeacher(
+                original->firstName, original->secondName, original->lastName,
+                original->dayBirth, original->monthBirth, original->yearBirth,
+                &original->id, t->salary
+            );
+        }
+        
+        if (copy){
+            mapper(copy);
+            addPerson(result, copy);
+        }
     }
     
-    for (int i = 0; i < arr->size; i++) {
-        result->data[i] = arr->data[i];
-        result->data[i].firstName = strdup(arr->data[i].firstName);
-        result->data[i].secondName = strdup(arr->data[i].secondName);
-        result->data[i].lastName = strdup(arr->data[i].lastName);
-        mapper(&result->data[i]);
-    }
-    
-    result->size = arr->size;
     return result;
 }
 
-TeacherArray* mapTeachers(TeacherArray* arr, int (*mapper)(Teacher*)) {
-    if (!arr || !mapper) return NULL;
-    TeacherArray* result = malloc(sizeof(TeacherArray));
-    if (!result) return NULL;
-    initTeacherList(result);
-    
-    if (arr->size > 0) {
-        result->data = malloc(arr->size * sizeof(Teacher));
-        if (!result->data) { 
-            free(result); 
-            return NULL; 
-        }
-    } else {
-        result->data = NULL;
-    }
-    
-    for (int i = 0; i < arr->size; i++) {
-        result->data[i] = arr->data[i];
-        result->data[i].firstName = strdup(arr->data[i].firstName);
-        result->data[i].secondName = strdup(arr->data[i].secondName);
-        result->data[i].lastName = strdup(arr->data[i].lastName);
-        mapper(&result->data[i]);
-    }
-    
-    result->size = arr->size;
-    return result;
-}
-
-void concatPrint(StudentArray* students, TeacherArray* teachers) {
+void concatPrint(PersonArray* persons){
     printf("\n=== ОБЪЕДИНЁННЫЙ СПИСОК ===\n");
-    int total = 0;
     
-    if (students && students->size > 0) {
-        printf("  -- Студенты (%d):\n", students->size);
-        printAllStudents(students);
-        total += students->size;
+    if (!persons || persons->size == 0){
+        printf("  (список пуст)\n");
+        return;
     }
     
-    if (teachers && teachers->size > 0) {
-        printf("  -- Преподаватели (%d):\n", teachers->size);
-        printAllTeachers(teachers);
-        total += teachers->size;
+    int studentCount = 0, teacherCount = 0;
+    
+    for (int i = 0; i < persons->size; i++){
+        if (isStudent(persons->data[i])) studentCount++;
+        else if (isTeacher(persons->data[i])) teacherCount++;
     }
     
-    if (total == 0) {
-        printf("  (списки пусты)\n");
-    } else {
-        printf("  Итого: %d человек\n", total);
-    }
-}
-
-void findPersonByID(StudentArray* students, TeacherArray* teachers, int series, int number) {
-    Student* s = findStudentByID(students, series, number);
-    Teacher* t = findTeacherByID(teachers, series, number);
-    
-    if (s) {
-        printf("Найден студент:\n");
-        printStudent(s);
-    } else if (t) {
-        printf("Найден преподаватель:\n");
-        printTeacher(t);
-    } else {
-        printf("Человек с таким паспортом не найден.\n");
-    }
-}
-
-Student* findStudentByID(StudentArray* arr, int series, int number) {
-    if (!arr || arr->data == NULL) return NULL;
-    Person_ID searchID = {series, number};
-    
-    for (int i = 0; i < arr->size; i++) {
-        if (comparePassportIDs(&arr->data[i].id, &searchID)) {
-            return &arr->data[i];
+    if (studentCount > 0){
+        printf("  -- Студенты (%d):\n", studentCount);
+        for (int i = 0; i < persons->size; i++){
+            if (isStudent(persons->data[i])){
+                printPerson(persons->data[i]);
+            }
         }
     }
-    return NULL;
-}
-
-Teacher* findTeacherByID(TeacherArray* arr, int series, int number) {
-    if (!arr || arr->data == NULL) return NULL;
-    Person_ID searchID = {series, number};
     
-    for (int i = 0; i < arr->size; i++) {
-        if (comparePassportIDs(&arr->data[i].id, &searchID)) {
-            return &arr->data[i];
+    if (teacherCount > 0){
+        printf("  -- Преподаватели (%d):\n", teacherCount);
+        for (int i = 0; i < persons->size; i++){
+            if (isTeacher(persons->data[i])){
+                printPerson(persons->data[i]);
+            }
         }
     }
-    return NULL;
+    
+    printf("  Итого: %d человек\n", persons->size);
+}
+
+void printStudentsOnly(PersonArray* arr){
+    printf("\n=== СТУДЕНТЫ ===\n");
+    int count = 0;
+    if (!arr || arr->size == 0){
+        printf("  (список пуст)\n");
+        return;
+    }
+    for (int i = 0; i < arr->size; i++){
+        if (isStudent(arr->data[i])){
+            printPerson(arr->data[i]);
+            count++;
+        }
+    }
+    if (count == 0) printf("  (нет студентов)\n");
+    else printf("  Всего студентов: %d\n", count);
+}
+
+void printTeachersOnly(PersonArray* arr){
+    printf("\n=== ПРЕПОДАВАТЕЛИ ===\n");
+    int count = 0;
+    if (!arr || arr->size == 0){
+        printf("  (список пуст)\n");
+        return;
+    }
+    for (int i = 0; i < arr->size; i++){
+        if (isTeacher(arr->data[i])){
+            printPerson(arr->data[i]);
+            count++;
+        }
+    }
+    if (count == 0) printf("  (нет преподавателей)\n");
+    else printf("  Всего преподавателей: %d\n", count);
 }

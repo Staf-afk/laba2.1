@@ -1,98 +1,26 @@
-#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "student.h"
 
-void initStudentList(StudentArray* arr) {
-    arr->data = NULL;
-    arr->size = 0;
-}
-
-void addStudent(StudentArray* arr, char* firstName,
-               char* secondName, char* lastName,
-               int dayStudentBirth, int monthStudentBirth, int yearStudentBirth, 
-               Student_ID* ID, int scholarship) {
-    Student* newData = (Student*)realloc(arr->data, (arr->size + 1) * sizeof(Student));
-    if (newData == NULL) {
+Student* createStudent(char* firstName, char* secondName, char* lastName,
+                       int dayBirth, int monthBirth, int yearBirth,
+                       Person_ID* id, int scholarship){
+    Student* s = (Student*)malloc(sizeof(Student));
+    if (!s){
         printf("Ошибка выделения памяти.\n");
-        return;
-    }
-    arr->data = newData;
-    arr->data[arr->size].firstName = strdup(firstName);
-    arr->data[arr->size].secondName = strdup(secondName);
-    arr->data[arr->size].lastName = strdup(lastName);
-    arr->data[arr->size].dayStudentBirth = dayStudentBirth;
-    arr->data[arr->size].monthStudentBirth = monthStudentBirth;
-    arr->data[arr->size].yearStudentBirth = yearStudentBirth;
-    arr->data[arr->size].id = *ID;
-    arr->data[arr->size].scholarship = scholarship;
-    arr->size++;
-}
-
-void removeStudent(StudentArray* arr, int index) {
-    if (index < 0 || index >= arr->size) {
-        printf("Неверный индекс человека.\n");
-        return;
+        return NULL;
     }
     
-    free(arr->data[index].firstName);
-    free(arr->data[index].secondName);
-    free(arr->data[index].lastName);
+    s->base.firstName = strdup(firstName);
+    s->base.secondName = strdup(secondName);
+    s->base.lastName = strdup(lastName);
+    s->base.dayBirth = dayBirth;
+    s->base.monthBirth = monthBirth;
+    s->base.yearBirth = yearBirth;
+    s->base.id = *id;
+    s->base.type = PERSON_STUDENT;
+    s->scholarship = scholarship;
     
-    if (arr->size == 1) {
-        free(arr->data);
-        arr->data = NULL;
-        arr->size = 0;
-        printf("Последний человек удален. Массив пуст.\n");
-        return;
-    }
-    
-    Student* new_data = (Student*)malloc((arr->size - 1) * sizeof(Student));
-    if (new_data == NULL) {
-        printf("Ошибка выделения памяти при удалении!\n");
-        return;
-    }
-    
-    for (int i = 0; i < index; i++) {
-        new_data[i] = arr->data[i];
-    }
-    for (int i = index + 1; i < arr->size; i++) {
-        new_data[i - 1] = arr->data[i];
-    }
-    
-    free(arr->data);
-    arr->data = new_data;
-    arr->size--;
-    printf("Человек с индексом %d удален. Осталось: %d\n", index + 1, arr->size);
-}
-
-void freeStudentArray(StudentArray* arr) {
-    if (arr->data != NULL) {
-        for (int i = 0; i < arr->size; i++) {
-            free(arr->data[i].firstName);
-            free(arr->data[i].secondName);
-            free(arr->data[i].lastName);
-        }
-        free(arr->data);
-        arr->data = NULL;
-    }
-    arr->size = 0;
-}
-
-void printStudent(Student* t) {
-    if (!t) return;
-    printf("  [Студент] %s %s %s | Стипендия: %d | Дата рождения: %d.%d.%d\n", 
-           t->lastName, t->firstName, t->secondName, 
-           t->scholarship, t->dayStudentBirth, t->monthStudentBirth, t->yearStudentBirth);
-}
-
-void printAllStudents(StudentArray* arr) {
-    if (!arr || arr->size == 0) {
-        printf("  (список студентов пуст)\n");
-        return;
-    }
-    for (int i = 0; i < arr->size; i++) {
-        printStudent(&arr->data[i]);
-    }
+    return s;
 }
