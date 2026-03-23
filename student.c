@@ -15,6 +15,11 @@ Student* createStudent(char* firstName, char* secondName, char* lastName,
     s->base.firstName = strdup(firstName);
     s->base.secondName = strdup(secondName);
     s->base.lastName = strdup(lastName);
+    if (!s->base.firstName || !s->base.secondName || !s->base.lastName){
+        printf("Ошибка выделения памяти для строк.\n");
+        free(s);
+        return NULL;
+    }
     s->base.dayBirth = dayBirth;
     s->base.monthBirth = monthBirth;
     s->base.yearBirth = yearBirth;

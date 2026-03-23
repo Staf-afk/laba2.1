@@ -15,6 +15,11 @@ Teacher* createTeacher(char* firstName, char* secondName, char* lastName,
     t->base.firstName = strdup(firstName);
     t->base.secondName = strdup(secondName);
     t->base.lastName = strdup(lastName);
+    if (!t->base.firstName || !t->base.secondName || !t->base.lastName) {
+    printf("Ошибка выделения памяти для строк.\n");
+    free(t);
+    return NULL;
+    }
     t->base.dayBirth = dayBirth;
     t->base.monthBirth = monthBirth;
     t->base.yearBirth = yearBirth;

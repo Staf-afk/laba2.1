@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "funcs.h"
+#include "student.h"
+#include "teacher.h"
 
 int addPrefixToPersonName(PersonBase* p){
     if (!p || !p->firstName) return 0;
-    char* newFirst = malloc(strlen(p->firstName) + 17);
+    char* newFirst = malloc(strlen(p->firstName) + 19);
     if (!newFirst) return 0;
     sprintf(newFirst, "[префикс] %s", p->firstName);
     free(p->firstName);
@@ -52,36 +55,32 @@ PersonArray* mapPersons(PersonArray* arr, int (*mapper)(PersonBase*)){
 
 void concatPrint(PersonArray* persons){
     printf("\n=== ОБЪЕДИНЁННЫЙ СПИСОК ===\n");
-    
     if (!persons || persons->size == 0){
         printf("  (список пуст)\n");
         return;
     }
     
-    int studentCount = 0, teacherCount = 0;
-    
+    printf("  -- Студенты:\n");
+    int studentCount = 0;
     for (int i = 0; i < persons->size; i++){
-        if (isStudent(persons->data[i])) studentCount++;
-        else if (isTeacher(persons->data[i])) teacherCount++;
-    }
-    
-    if (studentCount > 0){
-        printf("  -- Студенты (%d):\n", studentCount);
-        for (int i = 0; i < persons->size; i++){
-            if (isStudent(persons->data[i])){
-                printPerson(persons->data[i]);
-            }
+        if (isStudent(persons->data[i])){
+            printf("%d", studentCount + 1);
+            printPerson(persons->data[i]);
+            studentCount++;
         }
     }
+    if (studentCount == 0) printf("  (нет студентов)\n");
     
-    if (teacherCount > 0){
-        printf("  -- Преподаватели (%d):\n", teacherCount);
-        for (int i = 0; i < persons->size; i++){
-            if (isTeacher(persons->data[i])){
-                printPerson(persons->data[i]);
-            }
+    printf("  -- Преподаватели:\n");
+    int teacherCount = 0;
+    for (int i = 0; i < persons->size; i++){
+        if (isTeacher(persons->data[i])){
+            printf("%d", studentCount + teacherCount + 1);
+            printPerson(persons->data[i]);
+            teacherCount++;
         }
     }
+    if (teacherCount == 0) printf("  (нет преподавателей)\n");
     
     printf("  Итого: %d человек\n", persons->size);
 }
@@ -116,6 +115,48 @@ void printTeachersOnly(PersonArray* arr){
             count++;
         }
     }
-    if (count == 0) printf("  (нет преподавателей)\n");
-    else printf("  Всего преподавателей: %d\n", count);
+    if (count == 0){
+        printf("  (нет преподавателей)\n");
+    }
+    else{ 
+        printf("  Всего преподавателей: %d\n", count);
+    }
 }
+
+void isValidName(char* name){
+    if (name == NULL || strlen(name) == 0){
+        printf("Вы ничего не ввели.\n");
+        return;
+    }
+
+    if (strlen(name) > 50){
+        printf("Сомнительная длина имени.\n");
+        return;
+    }
+
+    for (int i = 0; name[i] != '\0'; i++){
+        if (isdigit((unsigned char)name[i])){
+            printf("Вы ввели цифру в имени(что-то явно не так).\n");
+            return;  
+        }
+    }
+}
+
+void isValidDate(int day, int month, int year){
+    if(day >= 32 || day <= 0 || month <= 0 || month >= 13 || year >= 2010 || year <= 1920){}
+}
+
+/*================================================
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||   ЗДЕСЬ МОГЛА БЫ БЫТЬ ВАША РЕКЛАМА,           ||
+||      ЛИШЬ ЗА  ДОП БАЛЛЫ ЗА ЛАБУ               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+==================================================*/

@@ -1,81 +1,84 @@
 #ifndef TESTS_H
 #define TESTS_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
+#include "person.h"
 #include "student.h"
 #include "teacher.h"
 #include "funcs.h"
 
-// Глобальные счетчики для статистики
-extern int testsPassed;
-extern int testsFailed;
-extern int testsTotal;
+// ============================================================
+// МАКРОСЫ ДЛЯ ТЕСТИРОВАНИЯ
+// ============================================================
+#define TEST_START(name) printf("Тест: %s... ", name)
+#define TEST_PASS() { tests_passed++; printf("PASSED\n"); }
+#define TEST_FAIL(msg) { tests_failed++; printf("FAILED: %s\n", msg); }
+#define ASSERT(cond, msg) if (!(cond)) { TEST_FAIL(msg); return; }
 
-// Макросы для запуска и проверок
-#define TEST(name) void test##name(void)
-#define RUN_TEST(name) do { \
-    printf("  [ЗАПУСК] %s... ", #name); \
-    test##name(); \
-} while(0)
+// Глобальные счётчики
+extern int tests_passed;
+extern int tests_failed;
 
-#define ASSERT_TRUE(cond) do { \
-    if (!(cond)) { \
-        printf("ПРОВАЛ (Условие не выполнено: %s)\n", #cond); \
-        testsFailed++; \
-        return; \
-    } \
-} while(0)
+// ============================================================
+// ТЕСТЫ ДЛЯ person.c
+// ============================================================
+void test_setPassportFormat(void);
+void test_getPassportFormat(void);
+void test_comparePassportIDs(void);
+void test_printPassportID(void);
+void test_initPersonList(void);
+void test_addPerson(void);
+void test_removePerson(void);
+void test_freePersonArray(void);
+void test_isStudent_isTeacher(void);
+void test_printPerson(void);
+void test_printAllPersons(void);
+void test_findPersonByID(void);
+void test_findStudentByIndex(void);
+void test_findTeacherByIndex(void);
 
-#define ASSERT_FALSE(cond) ASSERT_TRUE(!(cond))
-#define ASSERT_NULL(ptr) ASSERT_TRUE((ptr) == NULL)
-#define ASSERT_NOT_NULL(ptr) ASSERT_TRUE((ptr) != NULL)
+// ============================================================
+// ТЕСТЫ ДЛЯ student.c
+// ============================================================
+void test_createStudent(void);
+void test_createStudent_nullInput(void);
+void test_createStudent_memoryFailure(void);
 
-#define ASSERT_EQ_INT(a, b) do { \
-    if ((a) != (b)) { \
-        printf("ПРОВАЛ (Ожидалось %d, получено %d)\n", (b), (a)); \
-        testsFailed++; \
-        return; \
-    } \
-} while(0)
+// ============================================================
+// ТЕСТЫ ДЛЯ teacher.c
+// ============================================================
+void test_createTeacher(void);
+void test_createTeacher_nullInput(void);
+void test_createTeacher_memoryFailure(void);
 
-#define ASSERT_EQ_STR(a, b) do { \
-    if (strcmp((a), (b)) != 0) { \
-        printf("ПРОВАЛ (Ожидалось '%s', получено '%s')\n", (b), (a)); \
-        testsFailed++; \
-        return; \
-    } \
-} while(0)
+// ============================================================
+// ТЕСТЫ ДЛЯ funcs.c
+// ============================================================
+void test_addPrefixToPersonName(void);
+void test_addPrefixToPersonName_nullInput(void);
+void test_mapPersons(void);
+void test_mapPersons_nullInput(void);
+void test_mapPersons_emptyArray(void);
+void test_concatPrint(void);
+void test_concatPrint_nullInput(void);
+void test_concatPrint_emptyArray(void);
+void test_printStudentsOnly(void);
+void test_printTeachersOnly(void);
+void test_isValidName(void);
+void test_isValidDate(void);
 
-#define TEST_PASS() do { \
-    printf("УСПЕХ\n"); \
-    testsPassed++; \
-} while(0)
+// ============================================================
+// ТЕСТЫ ДЛЯ main.c (объявления функций)
+// ============================================================
+void clearInputBuffer(void);
+void printmenu(void);
+void test_inputPassportID(void);
+void test_inputFullName(void);
+void test_selectPassportFormat(void);
+void test_printmenu(void);
 
-// Инициализация и отчет
-#define TEST_INIT() do { \
-    printf("\n=== ЗАПУСК ТЕСТИРОВАНИЯ ===\n\n"); \
-    testsPassed = 0; \
-    testsFailed = 0; \
-    testsTotal = 0; \
-} while(0)
+// ============================================================
+// ЗАПУСК ВСЕХ ТЕСТОВ
+// ============================================================
+int runAllTests(void);
 
-#define TEST_REPORT() do { \
-    testsTotal = testsPassed + testsFailed; \
-    printf("\n=== ОТЧЕТ ПО ТЕСТАМ ===\n"); \
-    printf("Всего тестов:  %d\n", testsTotal); \
-    printf("Пройдено:      %d\n", testsPassed); \
-    printf("Провалено:     %d\n", testsFailed); \
-    if (testsFailed == 0) { \
-        printf("\n[OK] Все тесты пройдены успешно!\n"); \
-    } else { \
-        printf("\n[ERROR] Обнаружены ошибки в коде!\n"); \
-    } \
-} while(0)
-
-// Объявление главной функции тестов
-void runAllTests(void);
-
-#endif
+#endif 

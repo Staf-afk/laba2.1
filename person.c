@@ -28,6 +28,9 @@ void printPassportID(Person_ID* id){
     if(g_passportFormat == FORMAT_SINGLE_NUMBER){
         printf("ID: %d", id->series);
     }
+    else if(g_passportFormat == FORMAT_SPACE_SEPARATED){
+        printf("Паспорт: %d %d", id->series, id->number);
+    }
     else{
         printf("Паспорт: %d %d", id->series, id->number);
     }
@@ -69,21 +72,17 @@ void removePerson(PersonArray* arr, int index){
         return;
     }
     
-    PersonBase** new_data = (PersonBase**)malloc((arr->size - 1) * sizeof(PersonBase*));
-    if (new_data == NULL){
-        printf("Ошибка выделения памяти при удалении!\n");
-        return;
+    if (arr->size == 1){
+        free(arr->data);
+        arr->data = NULL;
+    } 
+    else{
+        for (int i = index; i < arr->size - 1; i++){
+            arr->data[i] = arr->data[i + 1];
+        }
+        PersonBase** newData = (PersonBase**)realloc(arr->data, (arr->size - 1) * sizeof(PersonBase*));
+        if (newData) arr->data = newData;
     }
-    
-    for (int i = 0; i < index; i++){
-        new_data[i] = arr->data[i];
-    }
-    for (int i = index + 1; i < arr->size; i++){
-        new_data[i - 1] = arr->data[i];
-    }
-    
-    free(arr->data);
-    arr->data = new_data;
     arr->size--;
     printf("Человек с индексом %d удален. Осталось: %d\n", index + 1, arr->size);
 }

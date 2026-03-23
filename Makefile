@@ -1,5 +1,5 @@
 CC = gcc
-SRCS = main.c student.c teacher.c funcs.c tests.c passport.c
+SRCS = main.c student.c teacher.c funcs.c tests.c person.c
 OBJS = $(SRCS:.c=.o)
 TARGET = laba2sem
 

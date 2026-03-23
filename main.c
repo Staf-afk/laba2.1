@@ -6,6 +6,7 @@
 #include "student.h"
 #include "teacher.h"
 #include "funcs.h"
+#include "tests.h"
 
 PersonArray people;
 
@@ -77,12 +78,15 @@ void inputPassportID(Person_ID* id){
 void inputFullName(char* firstName, char* secondName, char* lastName){
     printf("Введите имя: ");
     scanf("%49s", firstName);
+    isValidName(firstName);
     clearInputBuffer();
     printf("Введите отчество: ");
     scanf("%49s", secondName);
+    isValidName(secondName);
     clearInputBuffer();
     printf("Введите фамилию: ");
     scanf("%49s", lastName);
+    isValidName(lastName);
     clearInputBuffer();
 }
 
@@ -147,7 +151,12 @@ int main(void){
                 printf("\nВведите индекс человека для удаления: ");
                 scanf("%d", &index);
                 clearInputBuffer();
-                removePerson(&people, index - 1);
+                if (index < 1 || index > people.size){
+                    printf("Неверный индекс (должен быть от 1 до %d)\n", people.size);
+                } 
+                else{
+                    removePerson(&people, index - 1);
+                }
                 printf("\n");
                 break;
             }
@@ -185,14 +194,20 @@ int main(void){
             }
             case 8: {
                 PersonArray* mapped = mapPersons(&people, addPrefixToPersonName);
-                printf("\nПрефикс добавлен к именам.\n");
-                concatPrint(mapped);
-                freePersonArray(mapped);
-                free(mapped);
+                if (mapped){
+                    printf("\nПрефикс добавлен к именам.\n");
+                    concatPrint(mapped);
+                    freePersonArray(mapped);
+                    free(mapped);
+                } 
+                else{
+                    printf("Ошибка при добавлении префикса.\n");
+                }
                 printf("\n");
                 break;
             }
             case 9:{
+                runAllTests();
                 printf("\nТесты запущены.\n");
                 break;
             }
