@@ -26,6 +26,7 @@ typedef struct {
     int yearBirth;
     Person_ID id;
     PersonType type;
+     int (*getPayment)(void* self);
 } PersonBase;
 
 typedef struct {

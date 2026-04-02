@@ -3,29 +3,37 @@
 #include <string.h>
 #include "teacher.h"
 
+int teacherGetPayment(void* self) {
+    if (!self) return 0;
+    Teacher* t = (Teacher*)self;
+    return t->salary;
+}
+
 Teacher* createTeacher(char* firstName, char* secondName, char* lastName,
-                       int dayBirth, int monthBirth, int yearBirth,
-                       Person_ID* id, int salary){
-    Teacher* t = (Teacher*)malloc(sizeof(Teacher));
-    if (!t){
-        printf("Ошибка выделения памяти.\n");
+    int dayBirth, int monthBirth, int yearBirth,
+    Person_ID* id, int salary){
+    
+    Teacher* s = (Teacher*)malloc(sizeof(Teacher));
+    if (!s) return NULL;
+
+    s->base.firstName = firstName ? strdup(firstName) : strdup("");
+    s->base.secondName = secondName ? strdup(secondName) : strdup("");
+    s->base.lastName = lastName ? strdup(lastName) : strdup("");
+
+    if (!s->base.firstName || !s->base.secondName || !s->base.lastName) {
+        if (s->base.firstName) free(s->base.firstName);
+        if (s->base.secondName) free(s->base.secondName);
+        if (s->base.lastName) free(s->base.lastName);
+        free(s);
         return NULL;
     }
-    
-    t->base.firstName = strdup(firstName);
-    t->base.secondName = strdup(secondName);
-    t->base.lastName = strdup(lastName);
-    if (!t->base.firstName || !t->base.secondName || !t->base.lastName) {
-    printf("Ошибка выделения памяти для строк.\n");
-    free(t);
-    return NULL;
-    }
-    t->base.dayBirth = dayBirth;
-    t->base.monthBirth = monthBirth;
-    t->base.yearBirth = yearBirth;
-    t->base.id = *id;
-    t->base.type = PERSON_TEACHER;
-    t->salary = salary;
-    
-    return t;
+
+    s->base.dayBirth = dayBirth;
+    s->base.monthBirth = monthBirth;
+    s->base.yearBirth = yearBirth;
+    s->base.id = *id;
+    s->base.type = PERSON_TEACHER;
+    s->salary = salary;
+    s->base.getPayment = teacherGetPayment;
+    return s;
 }

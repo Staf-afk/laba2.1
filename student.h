@@ -3,8 +3,13 @@
 
 #include "person.h"
 
-Student* createStudent(char* firstName, char* secondName, char* lastName,
-                       int dayBirth, int monthBirth, int yearBirth,
-                       Person_ID* id, int scholarship);
+Student* createStudent(char* firstName, 
+                    char* secondName, 
+                    char* lastName,
+                    int dayBirth, 
+                    int monthBirth, 
+                    int yearBirth,
+                    Person_ID* id, 
+                    int scholarship);
 
 #endif
