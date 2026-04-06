@@ -2,7 +2,7 @@
 #include <string.h>
 #include "student.h"
 
-int studentGetPayment(void* self) {
+int studentGetPayment(void* self){
     if (!self) return 0;
     Student* s = (Student*)self;
     return s->scholarship;

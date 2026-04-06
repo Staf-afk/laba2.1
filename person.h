@@ -1,13 +1,13 @@
 #ifndef PERSON_H
 #define PERSON_H
 
-typedef enum {
+typedef enum{
     FORMAT_STRUCTURE = 0,
     FORMAT_SINGLE_NUMBER = 1,
     FORMAT_SPACE_SEPARATED = 2
 } PassportFormat;
 
-typedef struct {
+typedef struct{
     int series;
     int number;
 } Person_ID;
@@ -26,7 +26,7 @@ typedef struct {
     int yearBirth;
     Person_ID id;
     PersonType type;
-     int (*getPayment)(void* self);
+    int (*getPayment)(void* self);
 } PersonBase;
 
 typedef struct {

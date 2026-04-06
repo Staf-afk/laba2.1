@@ -3,7 +3,7 @@
 #include <string.h>
 #include "teacher.h"
 
-int teacherGetPayment(void* self) {
+int teacherGetPayment(void* self){
     if (!self) return 0;
     Teacher* t = (Teacher*)self;
     return t->salary;
