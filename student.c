@@ -2,15 +2,37 @@
 #include <string.h>
 #include "student.h"
 
-int studentGetPayment(void* self){
-    if (!self) return 0;
+void* studentGetPayment(void* self)
+{
+    if (!self) return NULL;
     Student* s = (Student*)self;
-    return s->scholarship;
+    return (void*)&s->scholarship;
 }
 
-Student* createStudent(char* firstName, char* secondName, char* lastName,
-    int dayBirth, int monthBirth, int yearBirth,
-    Person_ID* id, int scholarship){
+
+/*================================================
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||   ‡„…‘œ Œƒ‹€ › ›’œ ‚€˜€ …Š‹€Œ€,           ||
+||      ‹ˆ˜œ ‡€  „ €‹‹› ‡€ ‹€“               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+==================================================*/
+
+Student* createStudent(char* firstName, 
+    char* secondName, 
+    char* lastName,
+    int dayBirth, 
+    int monthBirth, 
+    int yearBirth,
+    Person_ID* id, 
+    int scholarship){
     
     Student* s = (Student*)malloc(sizeof(Student));
     if (!s) return NULL;

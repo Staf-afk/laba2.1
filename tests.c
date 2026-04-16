@@ -13,17 +13,29 @@ void printmenu(void);
 int tests_passed = 0;
 int tests_failed = 0;
 
-Student* createTestStudent(const char* fn, const char* sn, const char* ln,
-    int day, int month, int year,
-    int series, int number, int scholarship) {
+Student* createTestStudent(const char* fn, 
+    const char* sn, 
+    const char* ln,
+    int day, 
+    int month, 
+    int year,
+    int series, 
+    int number, 
+    int scholarship) {
     Person_ID id = {series, number};
     return createStudent((char*)fn, (char*)sn, (char*)ln,
         day, month, year, &id, scholarship);
 }
 
-Teacher* createTestTeacher(const char* fn, const char* sn, const char* ln,
-    int day, int month, int year,
-    int series, int number, int salary) {
+Teacher* createTestTeacher(const char* fn, 
+    const char* sn, 
+    const char* ln,
+    int day, 
+    int month, 
+    int year,
+    int series, 
+    int number, 
+    int salary) {
     Person_ID id = {series, number};
     return createTeacher((char*)fn, (char*)sn, (char*)ln,
         day, month, year, &id, salary);
@@ -296,7 +308,7 @@ void test_findTeacherByIndex(void) {
     ASSERT(found != NULL, "Преподаватель не найден по индексу 1");
     found = findTeacherByIndex(&arr, 0);
     ASSERT(found == NULL, "Найден преподаватель там, где студент");
-    found = findTeacherByIndex(&arr, 100);
+    found = findTeacherByIndex(&arr, 10);
     ASSERT(found == NULL, "Неверный индекс не обработан");
     freePersonArray(&arr);
     TEST_PASS();
@@ -501,7 +513,7 @@ void test_printStudentsOnly(void) {
     PersonArray arr;
     initPersonList(&arr);
     addPerson(&arr, (PersonBase*)createTestStudent("Иван", "Иванович", "Иванов",
-        1, 1, 2000, 1111, 2222, 5000));
+        1, 1, 2000, 1111, 2222, 500));
     addPerson(&arr, (PersonBase*)createTestTeacher("Петр", "Петрович", "Петров",
         1, 1, 1980, 3333, 4444, 50000));
     printf("--- printStudentsOnly ---\n");
@@ -608,8 +620,8 @@ void test_VTable_getPayment(void) {
     ASSERT(t != NULL, "Преподаватель не создан");
     ASSERT(s->base.getPayment != NULL, "VTable метод не установлен у студента");
     ASSERT(t->base.getPayment != NULL, "VTable метод не установлен у преподавателя");
-    ASSERT(s->base.getPayment((void*)s) == 5000, "Стипендия не совпадает");
-    ASSERT(t->base.getPayment((void*)t) == 50000, "Зарплата не совпадает");
+    ASSERT(*(int*)s->base.getPayment((void*)s) == 5000, "Стипендия не совпадает");
+    ASSERT(*(int*)t->base.getPayment((void*)t) == 50000, "Зарплата не совпадает");
     ASSERT(s->base.getPayment(NULL) == 0, "NULL обработка не работает");
     
     printPersonPayment((PersonBase*)s);
@@ -687,7 +699,7 @@ int runAllTests(void) {
     printf("Пройдено: " COLOR_GREEN "%d" COLOR_RESET "\n", tests_passed);
     printf("Провалено: " COLOR_RED "%d" COLOR_RESET "\n", tests_failed);
     printf("Всего: %d\n", tests_passed + tests_failed);
-    printf("========================================\n");
+
     
     if (tests_failed == 0) {
         printf(COLOR_GREEN "ВСЕ ТЕСТЫ ПРОЙДЕНЫ УСПЕШНО!" COLOR_RESET "\n");

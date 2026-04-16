@@ -3,6 +3,22 @@
 
 #include "person.h"
 
+/*================================================
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||   ‡„…‘œ Œƒ‹€ › ›’œ ‚€˜€ …Š‹€Œ€,           ||
+||      ‹ˆ˜œ ‡€  „ €‹‹› ‡€ ‹€“               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+==================================================*/
+
+
 Student* createStudent(char* firstName, 
                     char* secondName, 
                     char* lastName,
@@ -11,5 +27,8 @@ Student* createStudent(char* firstName,
                     int yearBirth,
                     Person_ID* id, 
                     int scholarship);
+
+
+
 
 #endif

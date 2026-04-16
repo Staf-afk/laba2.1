@@ -3,15 +3,36 @@
 #include <string.h>
 #include "teacher.h"
 
-int teacherGetPayment(void* self){
-    if (!self) return 0;
+void* teacherGetPayment(void* self)
+{
+    if (!self) return NULL;
     Teacher* t = (Teacher*)self;
-    return t->salary;
+    return (void*)&t->salary;
 }
 
-Teacher* createTeacher(char* firstName, char* secondName, char* lastName,
-    int dayBirth, int monthBirth, int yearBirth,
-    Person_ID* id, int salary){
+/*================================================
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||   ‡„…‘œ Œƒ‹€ › ›’œ ‚€˜€ …Š‹€Œ€,           ||
+||      ‹ˆ˜œ ‡€  „ €‹‹› ‡€ ‹€“               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+==================================================*/
+
+Teacher* createTeacher(char* firstName, 
+    char* secondName, 
+    char* lastName,
+    int dayBirth, 
+    int monthBirth, 
+    int yearBirth,
+    Person_ID* id, 
+    int salary){
     
     Teacher* s = (Teacher*)malloc(sizeof(Teacher));
     if (!s) return NULL;

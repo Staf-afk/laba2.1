@@ -167,13 +167,32 @@ PassportFormat getPassportFormat(void)
 int comparePassportIDs(Person_ID* id1, Person_ID* id2)
 {
     if(!id1 || !id2) return 0;
-    if(g_passportFormat == FORMAT_SINGLE_NUMBER){
+    if(g_passportFormat == FORMAT_SINGLE_NUMBER)
+    {
         return (id1->series == id2->series);
     }
     else{
         return (id1->series == id2->series && id1->number == id2->number);
     }
 }
+
+
+
+
+/*===========================================
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||             …‹€€                      ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+=============================================*/
 
 void printPassportID(Person_ID* id)
 {
@@ -192,11 +211,29 @@ void printPassportID(Person_ID* id)
     }
 }
 
+
+
 void initPersonList(PersonArray* arr)
 {
     arr->data = NULL;
     arr->size = 0;
 }
+
+
+/*===========================================
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||             …‹€€                      ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+=============================================*/
 
 void addPerson(PersonArray* arr, PersonBase* person)
 {
@@ -210,8 +247,29 @@ void addPerson(PersonArray* arr, PersonBase* person)
     arr->size++;
 }
 
+
+/*===========================================
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||             …‹€€                      ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+=============================================*/
+
 void removePerson(PersonArray* arr, int index)
 {
+
+    if (arr->size == 0){
+        printf("‘―¨α®ª ―γαβ, γ¤ «οβμ ­¥ª®£®.\n");
+    }
+
     if (index < 0 || index >= arr->size){
         printf("¥Ά¥ΰ­λ© ¨­¤¥ªα η¥«®Ά¥ª .\n");
         return;
@@ -249,6 +307,21 @@ void removePerson(PersonArray* arr, int index)
     printf("—¥«®Ά¥ª α ¨­¤¥ªα®¬ %d γ¤ «¥­. αβ «®αμ: %d\n", index + 1, arr->size);
 }
 
+/*===========================================
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||             …‹€€                      ||
+||                                          ||
+||               ›€…›€…›€                   ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+=============================================*/
+
 void freePersonArray(PersonArray* arr)
 {
     if (arr->data != NULL){
@@ -266,6 +339,21 @@ void freePersonArray(PersonArray* arr)
     arr->size = 0;
 }
 
+/*================================================
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||   ‡„…‘ ƒ‹€ › ›’ ‚€€ …‹€€,           ||
+||      ‹ ‡€  „ €‹‹› ‡€ ‹€“               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+||                                               ||
+==================================================*/
+
 int isStudent(PersonBase* p)
 {
     return p && p->type == PERSON_STUDENT;
@@ -279,6 +367,16 @@ int isTeacher(PersonBase* p)
 void printPerson(PersonBase* p)
 {
     if (!p) return;
+
+    void* paymentPtr = p->getPayment(p);
+    int payment;
+        if (paymentPtr != NULL) {
+            payment = *((int*)paymentPtr);
+        } 
+        else 
+        {
+            payment = 0;
+        }
     
     if (isStudent(p)){
         Student* s = (Student*)p;
@@ -305,6 +403,21 @@ void printAllPersons(PersonArray* arr)
         printPerson(arr->data[i]);
     }
 }
+
+/*===========================================
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||             …‹€€                      ||
+||             ‘                         ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+=============================================*/
 
 PersonBase* findPersonByID(PersonArray* arr, int series, int number)
 {
@@ -333,3 +446,18 @@ Teacher* findTeacherByIndex(PersonArray* arr, int index)
     PersonBase* p = arr->data[index];
     return isTeacher(p) ? (Teacher*)p : NULL;
 }
+
+/*===========================================
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||             …‹€€                      ||
+||                                          ||
+||               1 • ‚…’                    ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+||                                          ||
+=============================================*/
