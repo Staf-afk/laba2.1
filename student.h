@@ -22,9 +22,9 @@
 Student* createStudent(char* firstName, 
                     char* secondName, 
                     char* lastName,
-                    int dayBirth, 
-                    int monthBirth, 
-                    int yearBirth,
+                    uint8_t dayBirth, 
+                    uint8_t monthBirth, 
+                    uint8_t yearBirth,
                     Person_ID* id, 
                     int scholarship);
 

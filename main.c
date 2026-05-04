@@ -6,7 +6,7 @@
 #include "student.h"
 #include "teacher.h"
 #include "funcs.h"
-#include "tests.h"
+//#include "tests.h"
 
 /*Описание:
 Основной файл программы, содержащий точку входа (main) и логику пользовательского интерфейса (CLI). Отвечает за отображение меню, обработку ввода пользователя, координацию создания объектов и управление жизненным циклом программы.
@@ -441,8 +441,8 @@ void printmenu()
         "[6] - Вывести список преподавателей.\n"
         "[7] - Вывести всех.\n"
         "[8] - Добавить префикс к именам.\n"
-        "[9] - Запустить тесты.\n"
-        "[10] - Вывести доходы людей.\n "
+      //  "[9] - Запустить тесты.\n"
+        "[9] - Вывести доходы людей.\n "
         "[0] - Завершить программу.\n"
         "Выбор: "
     );
@@ -490,19 +490,37 @@ void inputPassportID(Person_ID* id)
     }
 }
 
-void inputFullName(char* firstName, char* secondName, char* lastName)
-{
+void inputFullName(char* firstName, char* secondName, char* lastName){
+    CodeError err;
+    
     printf("Введите имя: ");
     scanf("%49s", firstName);
-    isValidName(firstName);
+    err = isValidName(firstName);
+
+    if(err != ERROR_OK)
+    {
+        printf("Ошибка: %s\n", errorInWords(err));
+    }
     clearInputBuffer();
+    
     printf("Введите отчество: ");
     scanf("%49s", secondName);
-    isValidName(secondName);
+    err = isValidName(secondName);
+
+    if(err != ERROR_OK)
+    {
+        printf("Ошибка: %s\n", errorInWords(err));
+    }
     clearInputBuffer();
+    
     printf("Введите фамилию: ");
     scanf("%49s", lastName);
-    isValidName(lastName);
+    err = isValidName(lastName);
+
+    if(err != ERROR_OK)
+    {
+        printf("Ошибка: %s\n", errorInWords(err));
+    }
     clearInputBuffer();
 }
 
@@ -523,6 +541,7 @@ void inputFullName(char* firstName, char* secondName, char* lastName)
 
 int main(void)
 {   
+    /*
     printf("Для запуска программы пройдите тест на адекватность.\n");
     int captcha0, captcha1, captcha2, captcha3, captcha4, captcha5, captcha6, captcha7, captcha8, captcha9, captcha10;
     int checkcaptcha0, checkcaptcha1, checkcaptcha2, checkcaptcha3, checkcaptcha4, checkcaptcha5, checkcaptcha6, checkcaptcha7, checkcaptcha8, checkcaptcha9, checkcaptcha10;
@@ -612,19 +631,24 @@ int main(void)
         }
     }
 
-
+    */
 
 
     int choice = 1;
     int check1 = 0;
     char firstName[50], secondName[50], lastName[50];
-    int dayBirth = 0, monthBirth = 0, yearBirth = 0;
+    uint8_t dayBirth = 0, monthBirth = 0, yearBirth = 0;
     int salary, scholarship;
     int index;
     Person_ID id;
-    
+    CodeError err;
+
     selectPassportFormat();
-    initPersonList(&people);
+    err = initPersonList(&people);
+    if(err != ERROR_OK){
+        printf("Ошибка инициализации: %s\n", errorInWords(err));
+        return 1;
+    }
     
     while (choice != 0)
     {
@@ -643,9 +667,17 @@ int main(void)
                 printf("\n--- Добавление преподавателя ---\n");
                 inputPassportID(&id);
                 inputFullName(firstName, secondName, lastName);
+                
                 printf("Введите дату рождения (день месяц год): ");
                 scanf("%d %d %d", &dayBirth, &monthBirth, &yearBirth);
                 clearInputBuffer();
+                
+                err = isValidDate(dayBirth, monthBirth, yearBirth);
+                if(err != ERROR_OK){
+                    printf("Ошибка: %s\n", errorInWords(err));
+                    break;
+                }
+                
                 printf("Введите зарплату: ");
                 scanf("%d", &salary);
                 clearInputBuffer();
@@ -654,19 +686,39 @@ int main(void)
                                           dayBirth, monthBirth, yearBirth,
                                           &id, salary);
                 if (t){
-                    addPerson(&people, (PersonBase*)t);
-                    printf("Преподаватель добавлен.\n");
+                    err = addPerson(&people, (PersonBase*)t);
+                    if(err == ERROR_OK){
+                        printf("Преподаватель добавлен.\n");
+                    } 
+                    else{
+                        printf("Ошибка добавления: %s\n", errorInWords(err));
+                        // Освобождаем память, если добавить не удалось
+                        free(t->base.firstName);
+                        free(t->base.secondName);
+                        free(t->base.lastName);
+                        free(t);
+                    }
+                } 
+                else{
+                    printf("Ошибка создания преподавателя\n");
                 }
                 break;
             }
-            case 2: 
-            {
+            case 2: {
                 printf("\n--- Добавление студента ---\n");
                 inputPassportID(&id);
                 inputFullName(firstName, secondName, lastName);
+                
                 printf("Введите дату рождения (день месяц год): ");
                 scanf("%d %d %d", &dayBirth, &monthBirth, &yearBirth);
                 clearInputBuffer();
+                
+                err = isValidDate(dayBirth, monthBirth, yearBirth);
+                if(err != ERROR_OK){
+                    printf("Ошибка: %s\n", errorInWords(err));
+                    break;
+                }
+                
                 printf("Введите стипендию: ");
                 scanf("%d", &scholarship);
                 clearInputBuffer();
@@ -675,63 +727,71 @@ int main(void)
                                           dayBirth, monthBirth, yearBirth,
                                           &id, scholarship);
                 if (s){
-                    addPerson(&people, (PersonBase*)s);
-                    printf("Студент добавлен.\n");
+                    err = addPerson(&people, (PersonBase*)s);
+                    if(err == ERROR_OK){
+                        printf("Студент добавлен.\n");
+                    } 
+                    else {
+                        printf("Ошибка добавления: %s\n", errorInWords(err));
+                        free(s->base.firstName);
+                        free(s->base.secondName);
+                        free(s->base.lastName);
+                        free(s);
+                    }
+                } 
+                else {
+                    printf("Ошибка создания студента\n");
                 }
                 break;
             }
-            case 3: 
-            {
+            case 3: {
                 printf("\nВведите индекс человека для удаления: ");
                 scanf("%d", &index);
                 clearInputBuffer();
-                if (index < 1 || index > people.size){
-                    printf("Неверный индекс (должен быть от 1 до %d)\n", people.size);
+                
+                err = removePerson(&people, index - 1);
+                if(err == ERROR_OK){
+                    printf("Человек удалён.\n");
                 } 
-                else{
-                    removePerson(&people, index - 1);
+                else {
+                    printf("Ошибка удаления: %s\n", errorInWords(err));
                 }
                 printf("\n");
                 break;
             }
-            case 4: 
-            {
+            case 4: {
                 printf("\n--- Поиск по паспортным данным ---\n");
                 inputPassportID(&id);
                 PersonBase* p = findPersonByID(&people, id.series, id.number);
                 if (p){
                     printf("Найден:\n");
                     printPerson(p);
-                }
-                else{
+                } 
+                else {
                     printf("Человек с таким паспортом не найден.\n");
                 }
                 printf("\n");
                 break;
             }
-            case 5:
-            {
+            case 5: {
                 printf("\n");
                 printStudentsOnly(&people);
                 printf("\n");
                 break;
             }
-            case 6:
-            {
+            case 6: {
                 printf("\n");
                 printTeachersOnly(&people);
                 printf("\n");
                 break;
             }
-            case 7:
-            {
+            case 7: {
                 printf("\n");
                 concatPrint(&people);
                 printf("\n");
                 break;
             }
-            case 8: 
-            {
+            case 8: {
                 PersonArray* mapped = mapPersons(&people, addPrefixToPersonName);
                 if (mapped){
                     printf("\nПрефикс добавлен к именам.\n");
@@ -745,14 +805,7 @@ int main(void)
                 printf("\n");
                 break;
             }
-            case 9:
-            {
-                runAllTests();
-                printf("\nТесты запущены.\n");
-                break;
-            }
-            case 10:
-            {
+            case 9: {
                 printf("\n    Официальный доход лиц     \n");
                 for (int i = 0; i < people.size; i++) {
                     printPerson(people.data[i]);
@@ -761,12 +814,11 @@ int main(void)
                 printf("\n");
                 break;
             }
-            case 0:{
+            case 0: {
                 printf("Завершение работы.\n");
                 freePersonArray(&people);
                 break;
             }
-            break;
         }
     }
     return 0;

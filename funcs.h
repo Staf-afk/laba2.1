@@ -13,9 +13,9 @@ void printStudentsOnly(PersonArray* arr);
 
 void printTeachersOnly(PersonArray* arr);
 
-void isValidName(char* name);
+CodeError isValidName(char* name);
 
-void isValidDate(int day, int month, int year);
+CodeError isValidDate(int day, int month, int year);
 
 void printPersonPayment(PersonBase* p);
 

@@ -8,7 +8,112 @@
 #include "funcs.h"
 #include "tests.h"
 
-void printmenu(void);
+void clearInputBuffer()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+void selectPassportFormat()
+{
+    int choice;
+    int check;
+
+    while (1)
+    {
+        printf("Выберите формат паспорта:\n");
+        printf("[1] - Серия и номер (раздельно)\n");
+        printf("[2] - Только серия (упрощенный)\n");
+        printf("[3] - Серия и номер (через пробел)\n");
+        printf("Выбор: ");
+
+        check = scanf("%d", &choice);
+        clearInputBuffer();
+
+        if (check != 1 || choice < 1 || choice > 3)
+        {
+            printf("Ошибка ввода. Пожалуйста, введите число от 1 до 3.\n");
+            continue;
+        }
+
+        switch (choice)
+        {
+            case 1: setPassportFormat(FORMAT_STRUCTURE);       
+            break;
+
+            case 2: setPassportFormat(FORMAT_SINGLE_NUMBER);   
+            break;
+
+            case 3: setPassportFormat(FORMAT_SPACE_SEPARATED); 
+            break;
+
+        }
+
+        break; 
+    }
+}
+
+void printmenu()
+{
+    printf(
+        "========МЕНЮ=======\n"
+        "[1] - Добавить преподавателя.\n"
+        "[2] - Добавить студента.\n"
+        "[3] - Удалить человека.\n"
+        "[4] - Найти человека по ID.\n"
+        "[5] - Вывести список студентов.\n"
+        "[6] - Вывести список преподавателей.\n"
+        "[7] - Вывести всех.\n"
+        "[8] - Добавить префикс к именам.\n"
+      //  "[9] - Запустить тесты.\n"
+        "[10] - Вывести доходы людей.\n "
+        "[0] - Завершить программу.\n"
+        "Выбор: "
+    );
+}
+
+void inputPassportID(Person_ID* id)
+{
+    if (g_passportFormat == FORMAT_SINGLE_NUMBER)
+    {
+        printf("Введите уникальный ID паспорта: ");
+        scanf("%d", &id->series);
+        id->number = 0;
+        clearInputBuffer();
+    }
+    else if (g_passportFormat == FORMAT_SPACE_SEPARATED)
+    {
+        printf("Введите серию и номер через пробел: ");
+        scanf("%d %d", &id->series, &id->number);
+        clearInputBuffer();
+    }
+    else
+    {
+        printf("Введите серию паспорта: ");
+        scanf("%d", &id->series);
+        clearInputBuffer();
+        printf("Введите номер паспорта: ");
+        scanf("%d", &id->number);
+        clearInputBuffer();
+    }
+}
+
+void inputFullName(char* firstName, char* secondName, char* lastName)
+{
+    printf("Введите имя: ");
+    scanf("%49s", firstName);
+    isValidName(firstName);
+    clearInputBuffer();
+    printf("Введите отчество: ");
+    scanf("%49s", secondName);
+    isValidName(secondName);
+    clearInputBuffer();
+    printf("Введите фамилию: ");
+    scanf("%49s", lastName);
+    isValidName(lastName);
+    clearInputBuffer();
+}
+
 
 int tests_passed = 0;
 int tests_failed = 0;
@@ -513,7 +618,7 @@ void test_printStudentsOnly(void) {
     PersonArray arr;
     initPersonList(&arr);
     addPerson(&arr, (PersonBase*)createTestStudent("Иван", "Иванович", "Иванов",
-        1, 1, 2000, 1111, 2222, 500));
+        1, 1, 2000, 1111, 2222, 5000));
     addPerson(&arr, (PersonBase*)createTestTeacher("Петр", "Петрович", "Петров",
         1, 1, 1980, 3333, 4444, 50000));
     printf("--- printStudentsOnly ---\n");
@@ -708,4 +813,8 @@ int runAllTests(void) {
         printf(COLOR_RED "ЕСТЬ ПРОВАЛЕННЫЕ ТЕСТЫ!" COLOR_RESET "\n");
         return 1;
     }
+}
+
+int main(void){
+    runAllTests();
 }

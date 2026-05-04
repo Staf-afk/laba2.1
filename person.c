@@ -154,6 +154,22 @@ NULL в противном случае.*/
 
 PassportFormat g_passportFormat = FORMAT_STRUCTURE;
 
+
+const char* errorInWords(CodeError error){
+    switch(error){
+        case ERROR_OK:                 return "Успешно";
+        case ERROR_MEMORY_ALLOCATION:  return "Ошибка выделения памяти";
+        case ERROR_NULL_POINTER:       return "NULL указатель";
+        case ERROR_INVALID_INDEX:      return "Неверный индекс";
+        case ERROR_EMPTY_LIST:         return "Список пуст";
+        case ERROR_INVALID_NAME:       return "Некорректное имя";
+        case ERROR_INVALID_DATE:       return "Некорректная дата";
+        case ERROR_NOT_FOUND:          return "Элемент не найден";
+        case ERROR_MAPPER_FAILED:      return "Ошибка преобразования";
+        default:                       return "Неизвестная ошибка";
+    }
+}
+
 void setPassportFormat(PassportFormat format)
 {
     g_passportFormat = format;
@@ -213,10 +229,11 @@ void printPassportID(Person_ID* id)
 
 
 
-void initPersonList(PersonArray* arr)
-{
+CodeError initPersonList(PersonArray* arr){
+    if(!arr) return ERROR_NULL_POINTER;
     arr->data = NULL;
     arr->size = 0;
+    return ERROR_OK;
 }
 
 
@@ -235,16 +252,16 @@ void initPersonList(PersonArray* arr)
 ||                                          ||
 =============================================*/
 
-void addPerson(PersonArray* arr, PersonBase* person)
-{
+CodeError addPerson(PersonArray* arr, PersonBase* person){
+    if(!arr || !person) return ERROR_NULL_POINTER;
+    
     PersonBase** newData = (PersonBase**)realloc(arr->data, (arr->size + 1) * sizeof(PersonBase*));
-    if (newData == NULL){
-        printf("Ошибка выделения памяти.\n");
-        return;
-    }
+    if(!newData) return ERROR_MEMORY_ALLOCATION;
+    
     arr->data = newData;
     arr->data[arr->size] = person;
     arr->size++;
+    return ERROR_OK;
 }
 
 
@@ -263,17 +280,10 @@ void addPerson(PersonArray* arr, PersonBase* person)
 ||                                          ||
 =============================================*/
 
-void removePerson(PersonArray* arr, int index)
-{
-
-    if (arr->size == 0){
-        printf("Список пуст, удалять некого.\n");
-    }
-
-    if (index < 0 || index >= arr->size){
-        printf("Неверный индекс человека.\n");
-        return;
-    }
+CodeError removePerson(PersonArray* arr, int index){
+    if(!arr) return ERROR_NULL_POINTER;
+    if(arr->size == 0) return ERROR_EMPTY_LIST;
+    if(index < 0 || index >= arr->size) return ERROR_INVALID_INDEX;
     
     PersonBase* p = arr->data[index];
     free(p->firstName);
@@ -281,30 +291,20 @@ void removePerson(PersonArray* arr, int index)
     free(p->lastName);
     free(p);
     
-    if (arr->size == 1)
-    {
+    for(int i = index; i < arr->size - 1; i++)
+        arr->data[i] = arr->data[i + 1];
+    
+    arr->size--;
+    
+    if(arr->size == 0){
         free(arr->data);
         arr->data = NULL;
-        arr->size = 0;
-        printf("Последний человек удален. Массив пуст.\n");
-        return;
+    } else {
+        PersonBase** newData = (PersonBase**)realloc(arr->data, arr->size * sizeof(PersonBase*));
+        if(newData) arr->data = newData;
     }
     
-    if (arr->size == 1)
-    {
-        free(arr->data);
-        arr->data = NULL;
-    } 
-    else{
-        for (int i = index; i < arr->size - 1; i++)
-        {
-            arr->data[i] = arr->data[i + 1];
-        }
-        PersonBase** newData = (PersonBase**)realloc(arr->data, (arr->size - 1) * sizeof(PersonBase*));
-        if (newData) arr->data = newData;
-    }
-    arr->size--;
-    printf("Человек с индексом %d удален. Осталось: %d\n", index + 1, arr->size);
+    return ERROR_OK;
 }
 
 /*===========================================

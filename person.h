@@ -1,10 +1,25 @@
 #ifndef PERSON_H
 #define PERSON_H
+#include <inttypes.h>
 
 typedef enum{
-    FORMAT_STRUCTURE = 0,
-    FORMAT_SINGLE_NUMBER = 1,
-    FORMAT_SPACE_SEPARATED = 2
+    ERROR_OK = 0,
+    ERROR_MEMORY_ALLOCATION = -1,
+    ERROR_NULL_POINTER = -2,
+    ERROR_INVALID_INDEX = -3,
+    ERROR_EMPTY_LIST = -4,
+    ERROR_INVALID_NAME = -5,
+    ERROR_INVALID_DATE = -6,
+    ERROR_NOT_FOUND = -7,
+    ERROR_MAPPER_FAILED = -8
+} CodeError;
+
+const char* errorInWords(CodeError error);
+
+typedef enum{
+    FORMAT_STRUCTURE,
+    FORMAT_SINGLE_NUMBER,
+    FORMAT_SPACE_SEPARATED
 } PassportFormat;
 
 
@@ -19,31 +34,22 @@ typedef enum {
     PERSON_TEACHER = 2
 } PersonType;
 
-/*================================================
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||   áÑÖëú åéÉãÄ Åõ Åõíú ÇÄòÄ êÖäãÄåÄ,           ||
-||           áÄ  Ñéè ÅÄããõ áÄ ãÄÅì               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-==================================================*/
+typedef enum {
+    PAYMENT_TYPE_INT,
+    PAYMENT_TYPE_DOUBLE
+} PaymentType;
 
-typedef struct {
+
+typedef struct PersonBase{
     char* firstName;
     char* secondName;
     char* lastName;
-    int dayBirth;
-    int monthBirth;
-    int yearBirth;
+    uint8_t dayBirth;
+    uint8_t monthBirth;
+    uint8_t yearBirth;
     Person_ID id;
     PersonType type;
-    void* (*getPayment)(void* self);
+    void* (*getPayment)(struct PersonBase* self);
 } PersonBase;
 
 /*================================================
@@ -107,11 +113,11 @@ void printPassportID(Person_ID* id);
 
 
 
-void initPersonList(PersonArray* arr);
+CodeError  initPersonList(PersonArray* arr);
 
-void addPerson(PersonArray* arr, PersonBase* person);
+CodeError  addPerson(PersonArray* arr, PersonBase* person);
 
-void removePerson(PersonArray* arr, int index);
+CodeError removePerson(PersonArray* arr, int index);
 
 void freePersonArray(PersonArray* arr);
 

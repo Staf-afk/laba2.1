@@ -289,27 +289,14 @@ void printTeachersOnly(PersonArray* arr)
 ||                                               ||
 ==================================================*/
 
-void isValidName(char* name)
-{
-    if (name == NULL || strlen(name) == 0)
-    {
-        printf("Вы ничего не ввели.\n");
-        return;
+CodeError isValidName(const char* name){
+    if(!name || strlen(name) == 0) return ERROR_INVALID_NAME;
+    if(strlen(name) > 50) return ERROR_INVALID_NAME;
+    
+    for(int i = 0; name[i]; i++){
+        if(isdigit((unsigned char)name[i])) return ERROR_INVALID_NAME;
     }
-
-    if (strlen(name) > 50)
-    {
-        printf("Сомнительная длина имени.\n");
-        return;
-    }
-
-    for (int i = 0; name[i] != '\0'; i++){
-        if (isdigit((unsigned char)name[i]))
-        {
-            printf("Вы ввели цифру в имени(что-то явно не так).\n");
-            return;  
-        }
-    }
+    return ERROR_OK;
 }
 
 /*================================================
@@ -327,9 +314,20 @@ void isValidName(char* name)
 ||                                               ||
 ==================================================*/
 
-void isValidDate(int day, int month, int year)
-{
-    if(day >= 32 || day <= 0 || month <= 0 || month >= 13 || year >= 2010 || year <= 1920){}
+CodeError isValidDate(int day, int month, int year){
+    if(day < 1 || day > 31) return ERROR_INVALID_DATE;
+    if(month < 1 || month > 12) return ERROR_INVALID_DATE;
+    if(year < 1920 || year > 2010) return ERROR_INVALID_DATE;
+    
+    if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) 
+        return ERROR_INVALID_DATE;
+    
+    if(month == 2){
+        int isLeap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+        if(day > (isLeap ? 29 : 28)) return ERROR_INVALID_DATE;
+    }
+    
+    return ERROR_OK;
 }
 
 
@@ -341,7 +339,7 @@ void printPersonPayment(PersonBase* p) {
         return;
     }
     
-    int payment = p->getPayment(p);
+    int payment = *((int*)p->getPayment(p));
     
     if (isStudent(p)) {
         printf("  Стипендия: %d руб.\n", payment);
