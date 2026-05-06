@@ -21,13 +21,14 @@
 
 
 Teacher* createTeacher(char* firstName, 
-                        char* secondName, 
-                        char* lastName,
-                       int dayBirth, 
-                       int monthBirth, 
-                       int yearBirth,
+                       char* secondName, 
+                       char* lastName,
+                       uint8_t dayBirth, 
+                       uint8_t monthBirth, 
+                       uint16_t yearBirth,
                        Person_ID* id, 
-                       int salary);
+                       unsigned int salary,
+                       CurrencyType currency);
 
 
 /*================================================

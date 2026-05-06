@@ -3,7 +3,7 @@
 #include <string.h>
 #include "teacher.h"
 
-void* teacherGetPayment(void* self)
+void* teacherGetPayment(struct PersonBase* self)
 {
     if (!self) return NULL;
     Teacher* t = (Teacher*)self;
@@ -28,11 +28,12 @@ void* teacherGetPayment(void* self)
 Teacher* createTeacher(char* firstName, 
     char* secondName, 
     char* lastName,
-    int dayBirth, 
-    int monthBirth, 
-    int yearBirth,
+    uint8_t dayBirth, 
+    uint8_t monthBirth, 
+    uint16_t yearBirth,
     Person_ID* id, 
-    int salary){
+    unsigned int salary,
+    CurrencyType currency){
     
     Teacher* s = (Teacher*)malloc(sizeof(Teacher));
     if (!s) return NULL;
@@ -54,6 +55,7 @@ Teacher* createTeacher(char* firstName,
     s->base.yearBirth = yearBirth;
     s->base.id = *id;
     s->base.type = PERSON_TEACHER;
+    s->base.currency = currency;
     s->salary = salary;
     s->base.getPayment = teacherGetPayment;
     return s;

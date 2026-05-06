@@ -2,7 +2,7 @@
 #include <string.h>
 #include "student.h"
 
-void* studentGetPayment(void* self)
+void* studentGetPayment(struct PersonBase* self)
 {
     if (!self) return NULL;
     Student* s = (Student*)self;
@@ -28,11 +28,12 @@ void* studentGetPayment(void* self)
 Student* createStudent(char* firstName, 
     char* secondName, 
     char* lastName,
-    int dayBirth, 
-    int monthBirth, 
-    int yearBirth,
+    uint8_t dayBirth, 
+    uint8_t monthBirth, 
+    uint16_t yearBirth,
     Person_ID* id, 
-    int scholarship){
+    unsigned int scholarship,
+    CurrencyType currency){
     
     Student* s = (Student*)malloc(sizeof(Student));
     if (!s) return NULL;
@@ -54,6 +55,7 @@ Student* createStudent(char* firstName,
     s->base.yearBirth = yearBirth;
     s->base.id = *id;
     s->base.type = PERSON_STUDENT;
+    s->base.currency = currency;
     s->scholarship = scholarship;
     s->base.getPayment = studentGetPayment;
     return s;

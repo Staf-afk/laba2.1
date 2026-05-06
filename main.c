@@ -6,366 +6,7 @@
 #include "student.h"
 #include "teacher.h"
 #include "funcs.h"
-//#include "tests.h"
 
-/*Описание:
-Основной файл программы, содержащий точку входа (main) и логику пользовательского интерфейса (CLI). Отвечает за отображение меню, обработку ввода пользователя, координацию создания объектов и управление жизненным циклом программы.
-Функции
-void clearInputBuffer(void)
-Описание:
-Очищает буфер стандартного ввода (stdin) от остаточных символов (обычно символа новой строки \n), оставшихся после предыдущего ввода (например, после scanf). Это предотвращает пропуск последующих вызовов ввода строк.
-Параметры:
-Отсутствуют.
-Возвращаемое значение:
-Отсутствует.
-Примечание:
-Использует цикл while, читающий символы до тех пор, пока не встретится \n или EOF.
-void selectPassportFormat(void)
-Описание:
-Предоставляет пользователю меню для выбора формата хранения и ввода паспортных данных. Устанавливает глобальную переменную формата паспорта.
-Параметры:
-Отсутствуют.
-Возвращаемое значение:
-Отсутствует.
-Побочные эффекты:
-Выводит меню в консоль.
-Считывает выбор пользователя.
-Вызывает setPassportFormat для установки глобального состояния.
-Варианты формата:
-FORMAT_STRUCTURE: Серия и номер вводятся раздельно.
-FORMAT_SINGLE_NUMBER: Только серия (упрощенный ID).
-FORMAT_SPACE_SEPARATED: Серия и номер через пробел в одну строку.
-void printmenu(void)
-Описание:
-Выводит главное меню программы на экран. Содержит список доступных действий (добавление, удаление, поиск, вывод списков, тесты, выход).
-Параметры:
-Отсутствуют.
-Возвращаемое значение:
-Отсутствует.
-void inputPassportID(Person_ID* id)
-Описание:
-Запрашивает у пользователя ввод паспортных данных в зависимости от текущего выбранного формата (g_passportFormat). Заполняет структуру Person_ID.
-Параметры:
-id: Указатель на структуру Person_ID, которую необходимо заполнить.
-Возвращаемое значение:
-Отсутствует.
-Логика:
-Если формат SINGLE_NUMBER: запрашивает только серию, номер устанавливается в 0.
-Если формат SPACE_SEPARATED: запрашивает серию и номер через пробел.
-Иначе (STRUCTURE): запрашивает серию и номер отдельными запросами.
-Примечание:
-После каждого scanf вызывается clearInputBuffer.
-void inputFullName(char* firstName, char* secondName, char* lastName)
-Описание:
-Запрашивает у пользователя ввод ФИО (Имя, Отчество, Фамилия).
-Параметры:
-firstName: Буфер для имени (макс. 49 символов + \0).
-secondName: Буфер для отчества.
-lastName: Буфер для фамилии.
-Возвращаемое значение:
-Отсутствует.
-Примечание:
-Использует scanf("%49s", ...) для ограничения длины ввода. После ввода каждого поля вызывается функция валидации isValidName, однако возврат валидации не проверяется (ввод не перезапрашивается при ошибке).
-int main(void)
-Описание:
-Точка входа в программу. Инициализирует систему, запускает главный цикл обработки меню и освобождает ресурсы перед завершением.
-Параметры:
-Отсутствуют.
-Возвращаемое значение:
-0: Успешное завершение.
-Логика работы:
-Выбор формата паспорта.
-Инициализация списка людей (initPersonList).
-Цикл while, работающий до выбора пункта "0".
-Обработка выбора через switch:
-1: Создание преподавателя (createTeacher, addPerson).
-2: Создание студента (createStudent, addPerson).
-3: Удаление по индексу (removePerson).
-4: Поиск по паспортным данным (findPersonByID).
-5-7: Вывод списков (студенты, преподаватели, все).
-8: Применение префикса к именам через mapPersons.
-9: Запуск тестов (runAllTests).
-0: Очистка памяти (freePersonArray) и выход.
-Локальные переменные:
-Буферы для ввода (имена, даты, ID).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Переменная выбора меню choice.*/
 
 PersonArray people;
 
@@ -375,10 +16,23 @@ void clearInputBuffer()
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+CurrencyType selectCurrency()
+{
+    uint8_t choice;
+    printf("Выберите валюту:\n");
+    printf("[1] - Рубли (RUB)\n");
+    printf("[2] - Доллары (USD)\n");
+    printf("Выбор: ");
+    scanf("%" SCNu8, &choice);
+    clearInputBuffer();
+    
+    return (choice == 2) ? CURRENCY_USD : CURRENCY_RUB;
+}
+
 void selectPassportFormat()
 {
-    int choice;
-    int check;
+    uint8_t choice;
+    uint8_t check;
 
     while (1)
     {
@@ -388,7 +42,7 @@ void selectPassportFormat()
         printf("[3] - Серия и номер (через пробел)\n");
         printf("Выбор: ");
 
-        check = scanf("%d", &choice);
+        check = scanf("%" SCNu8, &choice);
         clearInputBuffer();
 
         if (check != 1 || choice < 1 || choice > 3)
@@ -492,36 +146,48 @@ void inputPassportID(Person_ID* id)
 
 void inputFullName(char* firstName, char* secondName, char* lastName){
     CodeError err;
-    
-    printf("Введите имя: ");
-    scanf("%49s", firstName);
-    err = isValidName(firstName);
-
-    if(err != ERROR_OK)
-    {
-        printf("Ошибка: %s\n", errorInWords(err));
+    int valid = 0;
+    while (valid != 1){
+        printf("Введите имя: ");
+        scanf("%49s", firstName);
+        err = isValidName(firstName);
+        clearInputBuffer();
+        if(err != ERROR_OK){
+            printf("Ошибка: %s\n", errorInWords(err));
+            printf("Повторите ввод имени.\n");
+            continue;
+        }
+        valid = 1;
     }
-    clearInputBuffer();
     
-    printf("Введите отчество: ");
-    scanf("%49s", secondName);
-    err = isValidName(secondName);
-
-    if(err != ERROR_OK)
-    {
-        printf("Ошибка: %s\n", errorInWords(err));
+    valid = 0;
+    while (valid != 1){
+        printf("Введите отчество: ");
+        scanf("%49s", secondName);
+        err = isValidName(secondName);
+        clearInputBuffer();
+        
+        if(err != ERROR_OK){
+            printf("Ошибка: %s\n", errorInWords(err));
+            printf("Повторите ввод отчества.\n");
+            continue;
+        }
+        valid = 1;
     }
-    clearInputBuffer();
     
-    printf("Введите фамилию: ");
-    scanf("%49s", lastName);
-    err = isValidName(lastName);
-
-    if(err != ERROR_OK)
-    {
-        printf("Ошибка: %s\n", errorInWords(err));
+    valid = 0;
+    while (valid != 1){
+        printf("Введите фамилию: ");
+        scanf("%49s", lastName);
+        err = isValidName(lastName);
+        clearInputBuffer();
+        if(err != ERROR_OK) {
+            printf("Ошибка: %s\n", errorInWords(err));
+            printf("Повторите ввод фамилии.\n");
+            continue;
+        }
+        valid = 1;
     }
-    clearInputBuffer();
 }
 
 /*================================================
@@ -633,13 +299,13 @@ int main(void)
 
     */
 
-
-    int choice = 1;
-    int check1 = 0;
+    uint8_t choice = 1;
+    uint8_t check1 = 0;
     char firstName[50], secondName[50], lastName[50];
-    uint8_t dayBirth = 0, monthBirth = 0, yearBirth = 0;
-    int salary, scholarship;
-    int index;
+    uint8_t dayBirth = 0, monthBirth = 0;
+    uint16_t yearBirth = 0;
+    unsigned int salary, scholarship;
+    size_t index;
     Person_ID id;
     CodeError err;
 
@@ -667,24 +333,26 @@ int main(void)
                 printf("\n--- Добавление преподавателя ---\n");
                 inputPassportID(&id);
                 inputFullName(firstName, secondName, lastName);
-                
-                printf("Введите дату рождения (день месяц год): ");
-                scanf("%d %d %d", &dayBirth, &monthBirth, &yearBirth);
+                printf("Введите дату рождения через пробел (день месяц год): ");
+                scanf("%hhu %hhu %hu", &dayBirth, &monthBirth, &yearBirth);
                 clearInputBuffer();
+                //printf("%u %u %u", dayBirth, monthBirth, yearBirth);
                 
                 err = isValidDate(dayBirth, monthBirth, yearBirth);
                 if(err != ERROR_OK){
                     printf("Ошибка: %s\n", errorInWords(err));
                     break;
                 }
+                CurrencyType currency = selectCurrency();  
                 
                 printf("Введите зарплату: ");
-                scanf("%d", &salary);
+                scanf("%u", &salary);
+            //    printf("%u", salary);
                 clearInputBuffer();
                 
                 Teacher* t = createTeacher(firstName, secondName, lastName,
-                                          dayBirth, monthBirth, yearBirth,
-                                          &id, salary);
+                                        dayBirth, monthBirth, yearBirth,
+                                        &id, salary, currency);
                 if (t){
                     err = addPerson(&people, (PersonBase*)t);
                     if(err == ERROR_OK){
@@ -692,7 +360,6 @@ int main(void)
                     } 
                     else{
                         printf("Ошибка добавления: %s\n", errorInWords(err));
-                        // Освобождаем память, если добавить не удалось
                         free(t->base.firstName);
                         free(t->base.secondName);
                         free(t->base.lastName);
@@ -709,29 +376,27 @@ int main(void)
                 inputPassportID(&id);
                 inputFullName(firstName, secondName, lastName);
                 
-                printf("Введите дату рождения (день месяц год): ");
-                scanf("%d %d %d", &dayBirth, &monthBirth, &yearBirth);
+                printf("Введите дату рождения через пробел (день месяц год): ");
+                scanf("%hhu %hhu %hu", &dayBirth, &monthBirth, &yearBirth);
                 clearInputBuffer();
-                
                 err = isValidDate(dayBirth, monthBirth, yearBirth);
                 if(err != ERROR_OK){
                     printf("Ошибка: %s\n", errorInWords(err));
                     break;
                 }
-                
+                CurrencyType currency = selectCurrency();
                 printf("Введите стипендию: ");
-                scanf("%d", &scholarship);
+                scanf("%u", &scholarship);
                 clearInputBuffer();
-                
                 Student* s = createStudent(firstName, secondName, lastName,
-                                          dayBirth, monthBirth, yearBirth,
-                                          &id, scholarship);
+                                        dayBirth, monthBirth, yearBirth,
+                                        &id, scholarship, currency);
                 if (s){
                     err = addPerson(&people, (PersonBase*)s);
                     if(err == ERROR_OK){
                         printf("Студент добавлен.\n");
                     } 
-                    else {
+                    else{
                         printf("Ошибка добавления: %s\n", errorInWords(err));
                         free(s->base.firstName);
                         free(s->base.secondName);
@@ -739,14 +404,14 @@ int main(void)
                         free(s);
                     }
                 } 
-                else {
+                else{
                     printf("Ошибка создания студента\n");
                 }
                 break;
             }
             case 3: {
                 printf("\nВведите индекс человека для удаления: ");
-                scanf("%d", &index);
+                scanf("%zu", &index);
                 clearInputBuffer();
                 
                 err = removePerson(&people, index - 1);
@@ -807,9 +472,9 @@ int main(void)
             }
             case 9: {
                 printf("\n    Официальный доход лиц     \n");
-                for (int i = 0; i < people.size; i++) {
-                    printPerson(people.data[i]);
-                    printPersonPayment(people.data[i]);
+                for (size_t i = 0; i < people.size; i++) {
+                    printPerson(&people.data[i]);
+                    printPersonPayment(&people.data[i]);
                 }
                 printf("\n");
                 break;

@@ -15,7 +15,7 @@ void printTeachersOnly(PersonArray* arr);
 
 CodeError isValidName(char* name);
 
-CodeError isValidDate(int day, int month, int year);
+CodeError isValidDate(uint8_t day, uint8_t month, uint16_t year);
 
 void printPersonPayment(PersonBase* p);
 

@@ -24,9 +24,10 @@ Student* createStudent(char* firstName,
                     char* lastName,
                     uint8_t dayBirth, 
                     uint8_t monthBirth, 
-                    uint8_t yearBirth,
+                    uint16_t yearBirth,
                     Person_ID* id, 
-                    int scholarship);
+                    unsigned int scholarship,
+                    CurrencyType currency);
 
 
 

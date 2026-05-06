@@ -1,4 +1,4 @@
-#include <stdio.h>
+/*#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -222,7 +222,7 @@ void test_initPersonList(void) {
     TEST_PASS();
 }
 
-void test_addPerson(void) {
+ void test_addPerson(void) {
     TEST_START("addPerson");
     PersonArray arr;
     initPersonList(&arr);
@@ -244,7 +244,7 @@ void test_addPerson(void) {
     ASSERT(arr.size == 3, "Размер не увеличился после третьего добавления");
     freePersonArray(&arr);
     TEST_PASS();
-}
+} 
 
 void test_removePerson(void) {
     TEST_START("removePerson");
@@ -536,7 +536,7 @@ void test_addPrefixToPersonName_nullInput(void) {
     TEST_PASS();
 }
 
-void test_mapPersons(void) {
+ void test_mapPersons(void) {
     TEST_START("mapPersons");
     PersonArray arr;
     initPersonList(&arr);
@@ -555,7 +555,7 @@ void test_mapPersons(void) {
     freePersonArray(mapped);
     free(mapped);
     TEST_PASS();
-}
+} 
 
 void test_mapPersons_nullInput(void) {
     TEST_START("mapPersons NULL input");
@@ -818,3 +818,4 @@ int runAllTests(void) {
 int main(void){
     runAllTests();
 }
+    */

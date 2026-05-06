@@ -1,6 +1,7 @@
 #ifndef PERSON_H
 #define PERSON_H
 #include <inttypes.h>
+#include <stddef.h>
 
 typedef enum{
     ERROR_OK = 0,
@@ -14,7 +15,7 @@ typedef enum{
     ERROR_MAPPER_FAILED = -8
 } CodeError;
 
-const char* errorInWords(CodeError error);
+char* errorInWords(CodeError error);
 
 typedef enum{
     FORMAT_STRUCTURE,
@@ -22,10 +23,15 @@ typedef enum{
     FORMAT_SPACE_SEPARATED
 } PassportFormat;
 
+typedef enum {
+    CURRENCY_RUB,
+    CURRENCY_USD
+} CurrencyType;
+
 
 typedef struct{
-    int series;
-    int number;
+    unsigned int series;
+    unsigned int number;
 } Person_ID;
 
 
@@ -46,9 +52,10 @@ typedef struct PersonBase{
     char* lastName;
     uint8_t dayBirth;
     uint8_t monthBirth;
-    uint8_t yearBirth;
+    uint16_t yearBirth;
     Person_ID id;
     PersonType type;
+    CurrencyType currency;
     void* (*getPayment)(struct PersonBase* self);
 } PersonBase;
 
@@ -69,13 +76,13 @@ typedef struct PersonBase{
 
 typedef struct {
     PersonBase base;
-    int scholarship;
+    unsigned int scholarship;
 } Student;
 
 
 typedef struct {
     PersonBase base;
-    int salary;
+    unsigned int salary;
 } Teacher;
 
 /*================================================
@@ -93,9 +100,9 @@ typedef struct {
 ||                                               ||
 ==================================================*/
 
-typedef struct {
-    PersonBase** data;
-    int size;
+typedef struct{
+    PersonBase* data;
+    size_t size;
 } PersonArray;
 
 
@@ -117,7 +124,7 @@ CodeError  initPersonList(PersonArray* arr);
 
 CodeError  addPerson(PersonArray* arr, PersonBase* person);
 
-CodeError removePerson(PersonArray* arr, int index);
+CodeError removePerson(PersonArray* arr, size_t index);
 
 void freePersonArray(PersonArray* arr);
 
@@ -127,17 +134,19 @@ void printAllPersons(PersonArray* arr);
 
 
 
-PersonBase* findPersonByID(PersonArray* arr, int series, int number);
+PersonBase* findPersonByID(PersonArray* arr, unsigned int series, unsigned int number);
 
-Student* findStudentByIndex(PersonArray* arr, int index);
+Student* findStudentByIndex(PersonArray* arr, size_t index);
 
-Teacher* findTeacherByIndex(PersonArray* arr, int index);
+Teacher* findTeacherByIndex(PersonArray* arr, size_t index);
 
 
 
 int isStudent(PersonBase* p);
 
 int isTeacher(PersonBase* p);
+
+char* currencyToString(CurrencyType currency);
 
 
 #endif
