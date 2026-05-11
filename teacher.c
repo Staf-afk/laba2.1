@@ -10,21 +10,6 @@ void* teacherGetPayment(struct PersonBase* self)
     return (void*)&t->salary;
 }
 
-/*================================================
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||   ‡„…‘œ Œƒ‹€ › ›’œ ‚€˜€ …Š‹€Œ€,           ||
-||      ‹ˆ˜œ ‡€  „ €‹‹› ‡€ ‹€“               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-==================================================*/
-
 Teacher* createTeacher(char* firstName, 
     char* secondName, 
     char* lastName,

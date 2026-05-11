@@ -9,22 +9,6 @@ void* studentGetPayment(struct PersonBase* self)
     return (void*)&s->scholarship;
 }
 
-
-/*================================================
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||   ‡„…‘œ Œƒ‹€ › ›’œ ‚€˜€ …Š‹€Œ€,           ||
-||      ‹ˆ˜œ ‡€  „ €‹‹› ‡€ ‹€“               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-==================================================*/
-
 Student* createStudent(char* firstName, 
     char* secondName, 
     char* lastName,
