@@ -15,7 +15,7 @@ typedef enum{
     ERROR_MAPPER_FAILED = -8
 } CodeError;
 
-char* errorInWords(CodeError error);
+const char* errorInWords(CodeError error);
 
 typedef enum{
     FORMAT_STRUCTURE,
@@ -27,7 +27,6 @@ typedef enum {
     CURRENCY_RUB,
     CURRENCY_USD
 } CurrencyType;
-
 
 typedef struct{
     unsigned int series;
@@ -48,17 +47,15 @@ typedef struct PersonBase{
 
     void* (*getPayment)(PersonBase* self);
     void (*destroy)(PersonBase* self);
-    int (*comparePassport)(PersonBase* self, Person_ID* id);
+    int (*comparePassport)(PersonBase* self, Person_ID* id, PassportFormat format);
     char* (*getFullName)(PersonBase* self);
     char* (*toString)(PersonBase* self);
 } PersonBase;
-
 
 typedef struct {
     PersonBase base;
     unsigned int scholarship;
 } Student;
-
 
 typedef struct {
     PersonBase base;
@@ -68,17 +65,16 @@ typedef struct {
 typedef struct{
     PersonBase* data;
     size_t size;
+    PassportFormat passportFormat;
 } PersonArray;
 
-CodeError initPersonList(PersonArray* arr);
+CodeError initPersonList(PersonArray* arr, PassportFormat format);
 CodeError addPerson(PersonArray* arr, PersonBase* person);
 CodeError removePerson(PersonArray* arr, size_t index);
 void freePersonArray(PersonArray* arr);
 PersonBase* findPersonByID(PersonArray* arr, unsigned int series, unsigned int number);
 
-char* currencyToString(CurrencyType currency);
-void setPassportFormat(PassportFormat format);
-PassportFormat getPassportFormat(void);
-int comparePassportIDs(Person_ID* id1, Person_ID* id2);
+const char* currencyToString(CurrencyType currency);
+int comparePassportIDs(Person_ID* id1, Person_ID* id2, PassportFormat format);
 
 #endif

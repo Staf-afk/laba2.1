@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include "funcs.h"
@@ -21,7 +21,7 @@ PersonArray* mapPersons(PersonArray* arr, int (*mapper)(PersonBase*))
     
     PersonArray* result = malloc(sizeof(PersonArray));
     if (!result) return NULL;
-    if(initPersonList(result) != ERROR_OK){
+    if(initPersonList(result, arr->passportFormat) != ERROR_OK){
         free(result);
         return NULL;
     }
@@ -76,10 +76,9 @@ char* getPaymentString(PersonBase* p) {
     }
     
     unsigned int payment = *((unsigned int*)paymentPtr);
-    char* currencySym = currencyToString(p->currency);
+    const char* currencySym = currencyToString(p->currency);
     
-    size_t size = snprintf(NULL, 0, "Выплата: %u %s", payment, currencySym) + 1;
-    char* result = malloc(size);
+    char* result = malloc(100);
     if(result){
         sprintf(result, "Выплата: %u %s", payment, currencySym);
     }
@@ -111,4 +110,3 @@ CodeError isValidDate(uint8_t day, uint8_t month, uint16_t year){
     
     return ERROR_OK;
 }
-

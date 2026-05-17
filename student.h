@@ -3,7 +3,6 @@
 
 #include "person.h"
 
-
 Student* createStudent(char* firstName, 
                     char* secondName, 
                     char* lastName,
@@ -13,8 +12,5 @@ Student* createStudent(char* firstName,
                     Person_ID* id, 
                     unsigned int scholarship,
                     CurrencyType currency);
-
-
-
 
 #endif

@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "teacher.h"
 
@@ -16,17 +16,18 @@ void teacherDestroy(PersonBase* self){
     if(self->lastName) free(self->lastName);
 }
 
-int teacherComparePassport(PersonBase* self, Person_ID* id){
+int teacherComparePassport(PersonBase* self, Person_ID* id, PassportFormat format){
     if(!self || !id) return 0;
-    return comparePassportIDs(&self->id, id);
+    return comparePassportIDs(&self->id, id, format);
 }
 
 char* teacherGetFullName(PersonBase* self){
     if(!self) return NULL;
-    char* fullName = malloc(strlen(self->lastName) + strlen(self->firstName) + 
-                           strlen(self->secondName) + 3);
+    size_t len = strlen(self->lastName) + strlen(self->firstName) + 
+                 strlen(self->secondName) + 3;
+    char* fullName = malloc(len);
     if(fullName){
-        sprintf(fullName, "%s %s %s", self->lastName, self->firstName, self->secondName);
+        snprintf(fullName, len, "%s %s %s", self->lastName, self->firstName, self->secondName);
     }
     return fullName;
 }
@@ -42,7 +43,7 @@ char* teacherToString(PersonBase* self){
     
     char* result = malloc(size);
     if(result){
-        sprintf(result, "[Преподаватель] %s %s %s | ЗП: %u %s | Дата рождения: %hhu.%hhu.%hu",
+        snprintf(result, size, "[Преподаватель] %s %s %s | ЗП: %u %s | Дата рождения: %hhu.%hhu.%hu",
                 t->base.lastName, t->base.firstName, t->base.secondName,
                 t->salary, currencyToString(t->base.currency),
                 t->base.dayBirth, t->base.monthBirth, t->base.yearBirth);

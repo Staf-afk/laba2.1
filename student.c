@@ -16,17 +16,18 @@ void studentDestroy(PersonBase* self){
     if(self->lastName) free(self->lastName);
 }
 
-int studentComparePassport(PersonBase* self, Person_ID* id){
+int studentComparePassport(PersonBase* self, Person_ID* id, PassportFormat format){
     if(!self || !id) return 0;
-    return comparePassportIDs(&self->id, id);
+    return comparePassportIDs(&self->id, id, format);
 }
 
 char* studentGetFullName(PersonBase* self){
     if(!self) return NULL;
-    char* fullName = malloc(strlen(self->lastName) + strlen(self->firstName) + 
-                           strlen(self->secondName) + 3);
+    size_t len = strlen(self->lastName) + strlen(self->firstName) + 
+                 strlen(self->secondName) + 3;
+    char* fullName = malloc(len);
     if(fullName){
-        sprintf(fullName, "%s %s %s", self->lastName, self->firstName, self->secondName);
+        snprintf(fullName, len, "%s %s %s", self->lastName, self->firstName, self->secondName);
     }
     return fullName;
 }
@@ -34,7 +35,7 @@ char* studentGetFullName(PersonBase* self){
 char* studentToString(PersonBase* self){
     if(!self) return NULL;
     Student* s = (Student*)self;
-
+    
     size_t size = snprintf(NULL, 0, "[Студент] %s %s %s | Стипендия: %u %s | Дата рождения: %hhu.%hhu.%hu",
                           s->base.lastName, s->base.firstName, s->base.secondName,
                           s->scholarship, currencyToString(s->base.currency),
@@ -42,7 +43,7 @@ char* studentToString(PersonBase* self){
     
     char* result = malloc(size);
     if(result){
-        sprintf(result, "[Студент] %s %s %s | Стипендия: %u %s | Дата рождения: %hhu.%hhu.%hu",
+        snprintf(result, size, "[Студент] %s %s %s | Стипендия: %u %s | Дата рождения: %hhu.%hhu.%hu",
                 s->base.lastName, s->base.firstName, s->base.secondName,
                 s->scholarship, currencyToString(s->base.currency),
                 s->base.dayBirth, s->base.monthBirth, s->base.yearBirth);

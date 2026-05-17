@@ -3,10 +3,7 @@
 #include <string.h>
 #include "person.h"
 
-PassportFormat g_passportFormat = FORMAT_STRUCTURE;
-
-
-char* errorInWords(CodeError error){
+const char* errorInWords(CodeError error){
     switch(error){
         case ERROR_OK:                 return "Успешно";
         case ERROR_MEMORY_ALLOCATION:  return "Ошибка выделения памяти";
@@ -21,19 +18,9 @@ char* errorInWords(CodeError error){
     }
 }
 
-void setPassportFormat(PassportFormat format)
-{
-    g_passportFormat = format;
-}
-
-PassportFormat getPassportFormat(void)
-{
-    return g_passportFormat;
-}
-
-int comparePassportIDs(Person_ID* id1, Person_ID* id2){
+int comparePassportIDs(Person_ID* id1, Person_ID* id2, PassportFormat format){
     if(!id1 || !id2) return 0;
-    if(g_passportFormat == FORMAT_SINGLE_NUMBER){
+    if(format == FORMAT_SINGLE_NUMBER){
         return (id1->series == id2->series);
     }
     else{
@@ -41,10 +28,11 @@ int comparePassportIDs(Person_ID* id1, Person_ID* id2){
     }
 }
 
-CodeError initPersonList(PersonArray* arr){
+CodeError initPersonList(PersonArray* arr, PassportFormat format){
     if(!arr) return ERROR_NULL_POINTER;
     arr->data = NULL;
     arr->size = 0;
+    arr->passportFormat = format;
     return ERROR_OK;
 }
 
@@ -79,7 +67,6 @@ CodeError addPerson(PersonArray* arr, PersonBase* person){
     arr->size++;
     return ERROR_OK;
 }
-
 
 CodeError removePerson(PersonArray* arr, size_t index){
     if(!arr) return ERROR_NULL_POINTER;
@@ -132,7 +119,7 @@ PersonBase* findPersonByID(PersonArray* arr, unsigned int series, unsigned int n
     
     for (size_t i = 0; i < arr->size; i++){
         if(arr->data[i].comparePassport){
-            if(arr->data[i].comparePassport(&arr->data[i], &searchID)){
+            if(arr->data[i].comparePassport(&arr->data[i], &searchID, arr->passportFormat)){
                 return &arr->data[i];
             }
         }
@@ -140,9 +127,6 @@ PersonBase* findPersonByID(PersonArray* arr, unsigned int series, unsigned int n
     return NULL;
 }
 
-char* currencyToString(CurrencyType currency){
-    if (currency == CURRENCY_USD) {
-        return "USD";
-    }
-    return "RUB";
+const char* currencyToString(CurrencyType currency){
+    return (currency == CURRENCY_USD) ? "USD" : "RUB";
 }

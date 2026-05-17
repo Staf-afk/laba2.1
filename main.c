@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <inttypes.h>
 #include "person.h"
 #include "student.h"
 #include "teacher.h"
 #include "funcs.h"
-
 
 PersonArray people;
 
@@ -43,22 +43,32 @@ void printStudentsOnly(PersonArray* arr) {
         return;
     }
     for (size_t i = 0; i < arr->size; i++) {
-        // Здесь нужна проверка типа
-        printPerson(&arr->data[i]);
-        count++;
+        char* str = arr->data[i].toString(&arr->data[i]);
+        if(str && strstr(str, "[Студент]")) {
+            printf("%s\n", str);
+            count++;
+        }
+        free(str);
     }
     if (count == 0) printf("  (нет студентов)\n");
 }
 
 void printTeachersOnly(PersonArray* arr) {
     printf("\n=== ПРЕПОДАВАТЕЛИ ===\n");
+    size_t count = 0;
     if (!arr || arr->size == 0) {
         printf("  (список пуст)\n");
         return;
     }
     for (size_t i = 0; i < arr->size; i++) {
-        printPerson(&arr->data[i]);
+        char* str = arr->data[i].toString(&arr->data[i]);
+        if(str && strstr(str, "[Преподаватель]")) {
+            printf("%s\n", str);
+            count++;
+        }
+        free(str);
     }
+    if (count == 0) printf("  (нет преподавателей)\n");
 }
 
 void concatPrint(PersonArray* persons) {
@@ -82,7 +92,7 @@ CurrencyType selectCurrency() {
     return (choice == 2) ? CURRENCY_USD : CURRENCY_RUB;
 }
 
-void selectPassportFormat() {
+PassportFormat selectPassportFormat() {
     uint8_t choice;
     uint8_t check;
     while (1) {
@@ -98,14 +108,10 @@ void selectPassportFormat() {
             continue;
         }
         switch (choice) {
-            case 1: setPassportFormat(FORMAT_STRUCTURE); 
-            break;
-            case 2: setPassportFormat(FORMAT_SINGLE_NUMBER); 
-            break;
-            case 3: setPassportFormat(FORMAT_SPACE_SEPARATED); 
-            break;
+            case 1: return FORMAT_STRUCTURE;
+            case 2: return FORMAT_SINGLE_NUMBER;
+            case 3: return FORMAT_SPACE_SEPARATED;
         }
-        break;
     }
 }
 
@@ -121,31 +127,13 @@ void printmenu()
         "[6] - Вывести список преподавателей.\n"
         "[7] - Вывести всех.\n"
         "[8] - Добавить префикс к именам.\n"
-      //  "[9] - Запустить тесты.\n"
         "[9] - Вывести доходы людей.\n "
         "[0] - Завершить программу.\n"
         "Выбор: "
     );
 }
 
-
-/*================================================
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||   ЗДЕСЬ МОГЛА БЫ БЫТЬ ВАША РЕКЛАМА,           ||
-||      ЛИШЬ ЗА  ДОП БАЛЛЫ ЗА ЛАБУ               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-||                                               ||
-==================================================*/
-
-void inputPassportID(Person_ID* id) {
-    PassportFormat format = getPassportFormat();
+void inputPassportID(Person_ID* id, PassportFormat format) {
     if (format == FORMAT_SINGLE_NUMBER) {
         printf("Введите уникальный ID паспорта: ");
         scanf("%d", &id->series);
@@ -217,8 +205,8 @@ int main(void)
     Person_ID id;
     CodeError err;
 
-    selectPassportFormat();
-    err = initPersonList(&people);
+    PassportFormat format = selectPassportFormat();
+    err = initPersonList(&people, format);
     if(err != ERROR_OK){
         printf("Ошибка инициализации: %s\n", errorInWords(err));
         return 1;
@@ -239,7 +227,7 @@ int main(void)
         switch (choice) {
             case 1: {
                 printf("\n--- Добавление преподавателя ---\n");
-                inputPassportID(&id);
+                inputPassportID(&id, people.passportFormat);
                 inputFullName(firstName, secondName, lastName);
                 printf("Введите дату рождения через пробел (день месяц год): ");
                 scanf("%hhu %hhu %hu", &dayBirth, &monthBirth, &yearBirth);
@@ -273,7 +261,7 @@ int main(void)
             }
             case 2: {
                 printf("\n--- Добавление студента ---\n");
-                inputPassportID(&id);
+                inputPassportID(&id, people.passportFormat);
                 inputFullName(firstName, secondName, lastName);
                 printf("Введите дату рождения через пробел (день месяц год): ");
                 scanf("%hhu %hhu %hu", &dayBirth, &monthBirth, &yearBirth);
@@ -319,7 +307,7 @@ int main(void)
             }
             case 4: {
                 printf("\n--- Поиск по паспортным данным ---\n");
-                inputPassportID(&id);
+                inputPassportID(&id, people.passportFormat);
                 PersonBase* p = findPersonByID(&people, id.series, id.number);
                 if (p) {
                     printf("Найден:\n");
