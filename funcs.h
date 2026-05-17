@@ -4,20 +4,10 @@
 #include "person.h"
 
 int addPrefixToPersonName(PersonBase* p);
-
 PersonArray* mapPersons(PersonArray* arr, int (*mapper)(PersonBase*));
-
-void concatPrint(PersonArray* persons);
-
-void printStudentsOnly(PersonArray* arr);
-
-void printTeachersOnly(PersonArray* arr);
-
 CodeError isValidName(char* name);
-
 CodeError isValidDate(uint8_t day, uint8_t month, uint16_t year);
-
-void printPersonPayment(PersonBase* p);
+char* getPaymentString(PersonBase* p);
 
 
 

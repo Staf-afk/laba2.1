@@ -3,8 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 #include "funcs.h"
-#include "student.h"
-#include "teacher.h"
 
 int addPrefixToPersonName(PersonBase* p)
 {
@@ -31,123 +29,64 @@ PersonArray* mapPersons(PersonArray* arr, int (*mapper)(PersonBase*))
     for(size_t i = 0; i < arr->size; i++)
     {
         PersonBase* original = &arr->data[i];
-        PersonBase* copy = NULL;
+        PersonBase copy;
+    
+        copy.firstName = original->firstName ? strdup(original->firstName) : strdup("");
+        copy.secondName = original->secondName ? strdup(original->secondName) : strdup("");
+        copy.lastName = original->lastName ? strdup(original->lastName) : strdup("");
         
-        if (isStudent(original))
-        {
-            Student* s = (Student*)original;
-            copy = (PersonBase*)createStudent(
-                original->firstName, original->secondName, original->lastName,
-                original->dayBirth, original->monthBirth, original->yearBirth,
-                &original->id, s->scholarship, original->currency
-            );
+        if(!copy.firstName || !copy.secondName || !copy.lastName){
+            if(copy.firstName) free(copy.firstName);
+            if(copy.secondName) free(copy.secondName);
+            if(copy.lastName) free(copy.lastName);
+            freePersonArray(result);
+            free(result);
+            return NULL;
         }
-        else if (isTeacher(original))
-        {
-            Teacher* t = (Teacher*)original;
-            copy = (PersonBase*)createTeacher(
-                original->firstName, original->secondName, original->lastName,
-                original->dayBirth, original->monthBirth, original->yearBirth,
-                &original->id, t->salary, original->currency
-            );
+        copy.dayBirth = original->dayBirth;
+        copy.monthBirth = original->monthBirth;
+        copy.yearBirth = original->yearBirth;
+        copy.id = original->id;
+        copy.currency = original->currency;
+        copy.getPayment = original->getPayment;
+        copy.destroy = original->destroy;
+        copy.comparePassport = original->comparePassport;
+        copy.getFullName = original->getFullName;
+        copy.toString = original->toString;
+        
+        if(mapper(&copy)){
+            addPerson(result, &copy);
         }
-        if (copy){
-            mapper(copy);
-            addPerson(result, copy);
-            free(copy->firstName);
-            free(copy->secondName);
-            free(copy->lastName);
-            free(copy);
-        }
+        free(copy.firstName);
+        free(copy.secondName);
+        free(copy.lastName);
     }
     
     return result;
 }
 
-void concatPrint(PersonArray* persons)
-{
-    printf("\n=== ОБЪЕДИНЁННЫЙ СПИСОК ===\n");
-    if (!persons || persons->size == 0){
-        printf("  (список пуст)\n");
-        return;
+char* getPaymentString(PersonBase* p) {
+    if (!p || !p->getPayment) {
+        return strdup("Нет данных о выплате");
     }
     
-    printf("  -- Студенты:\n");
-    size_t studentCount = 0;
-    for (size_t i = 0; i < persons->size; i++)
-    {
-        if (isStudent(&persons->data[i]))
-        {
-            printf("%zu", studentCount + 1);
-            printPerson(&persons->data[i]);
-            studentCount++;
-        }
+    void* paymentPtr = p->getPayment(p);
+    if (!paymentPtr) {
+        return strdup("Ошибка получения выплаты");
     }
-    if (studentCount == 0) printf("  (нет студентов)\n");
     
-    printf("  -- Преподаватели:\n");
-    size_t teacherCount = 0;
-    for (size_t i = 0; i < persons->size; i++)
-    {
-        if (isTeacher(&persons->data[i])){
-            printf("%zu", studentCount + teacherCount + 1);
-            printPerson(&persons->data[i]);
-            teacherCount++;
-        }
-    }
-    if (teacherCount == 0) printf("  (нет преподавателей)\n");
+    unsigned int payment = *((unsigned int*)paymentPtr);
+    char* currencySym = currencyToString(p->currency);
     
-    printf("  Итого: %zu человек\n", persons->size);
+    size_t size = snprintf(NULL, 0, "Выплата: %u %s", payment, currencySym) + 1;
+    char* result = malloc(size);
+    if(result){
+        sprintf(result, "Выплата: %u %s", payment, currencySym);
+    }
+    return result;
 }
 
-void printStudentsOnly(PersonArray* arr)
-{
-    printf("\n=== СТУДЕНТЫ ===\n");
-    size_t count = 0;
-    if (!arr || arr->size == 0){
-        printf("  (список пуст)\n");
-        return;
-    }
-    for (size_t i = 0; i < arr->size; i++)
-    {
-        if (isStudent(&arr->data[i]))
-        {
-            printPerson(&arr->data[i]);
-            count++;
-        }
-    }
-    if (count == 0) printf("  (нет студентов)\n");
-    else printf("  Всего студентов: %zu\n", count);
-}
-
-void printTeachersOnly(PersonArray* arr)
-{
-    printf("\n=== ПРЕПОДАВАТЕЛИ ===\n");
-    size_t count = 0;
-    if (!arr || arr->size == 0)
-    {
-        printf("  (список пуст)\n");
-        return;
-    }
-    for (size_t i = 0; i < arr->size; i++)
-    {
-        if (isTeacher(&arr->data[i]))
-        {
-            printPerson(&arr->data[i]);
-            count++;
-        }
-    }
-    if (count == 0)
-    {
-        printf("  (нет преподавателей)\n");
-    }
-    else
-    { 
-        printf("  Всего преподавателей: %zu\n", count);
-    }
-}
-
-CodeError isValidName( char* name){
+CodeError isValidName(char* name){
     if(!name || strlen(name) == 0) return ERROR_INVALID_NAME;
     if(strlen(name) > 50) return ERROR_INVALID_NAME;
     
@@ -173,31 +112,3 @@ CodeError isValidDate(uint8_t day, uint8_t month, uint16_t year){
     return ERROR_OK;
 }
 
-
-void printPersonPayment(PersonBase* p) {
-    if (!p || !p->getPayment) {
-        printf("  Нет данных о выплате\n");
-        return;
-    }
-    
-    // Отладка: выводим сырой указатель
-    void* rawPtr = p->getPayment(p);
-    printf("  DEBUG: raw pointer = %p\n", rawPtr);
-    
-    // Читаем как unsigned int
-    unsigned int payment = *((unsigned int*)rawPtr);
-    printf("  DEBUG: payment as unsigned int = %u\n", payment);
-    
-    // Читаем как int (для сравнения)
-    int paymentSigned = *((int*)rawPtr);
-    printf("  DEBUG: payment as int = %d\n", paymentSigned);
-    
-    const char* currencySym = currencyToString(p->currency);
-    
-    if (isStudent(p)) {
-        printf("  Стипендия: %u %s\n", payment, currencySym);
-    } 
-    else if (isTeacher(p)) {
-        printf("  Зарплата: %u %s\n", payment, currencySym);
-    }
-}

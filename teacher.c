@@ -3,45 +3,87 @@
 #include <string.h>
 #include "teacher.h"
 
-void* teacherGetPayment(struct PersonBase* self)
-{
+void* teacherGetPayment(PersonBase* self){
     if (!self) return NULL;
     Teacher* t = (Teacher*)self;
     return (void*)&t->salary;
 }
 
-Teacher* createTeacher(char* firstName, 
+void teacherDestroy(PersonBase* self){
+    if(!self) return;
+    if(self->firstName) free(self->firstName);
+    if(self->secondName) free(self->secondName);
+    if(self->lastName) free(self->lastName);
+}
+
+int teacherComparePassport(PersonBase* self, Person_ID* id){
+    if(!self || !id) return 0;
+    return comparePassportIDs(&self->id, id);
+}
+
+char* teacherGetFullName(PersonBase* self){
+    if(!self) return NULL;
+    char* fullName = malloc(strlen(self->lastName) + strlen(self->firstName) + 
+                           strlen(self->secondName) + 3);
+    if(fullName){
+        sprintf(fullName, "%s %s %s", self->lastName, self->firstName, self->secondName);
+    }
+    return fullName;
+}
+
+char* teacherToString(PersonBase* self){
+    if(!self) return NULL;
+    Teacher* t = (Teacher*)self;
+    
+    size_t size = snprintf(NULL, 0, "[Преподаватель] %s %s %s | ЗП: %u %s | Дата рождения: %hhu.%hhu.%hu",
+                          t->base.lastName, t->base.firstName, t->base.secondName,
+                          t->salary, currencyToString(t->base.currency),
+                          t->base.dayBirth, t->base.monthBirth, t->base.yearBirth) + 1;
+    
+    char* result = malloc(size);
+    if(result){
+        sprintf(result, "[Преподаватель] %s %s %s | ЗП: %u %s | Дата рождения: %hhu.%hhu.%hu",
+                t->base.lastName, t->base.firstName, t->base.secondName,
+                t->salary, currencyToString(t->base.currency),
+                t->base.dayBirth, t->base.monthBirth, t->base.yearBirth);
+    }
+    return result;
+}
+
+Teacher* createTeacher(char* firstName,
     char* secondName, 
     char* lastName,
     uint8_t dayBirth, 
     uint8_t monthBirth, 
     uint16_t yearBirth,
     Person_ID* id, 
-    unsigned int salary,
+    unsigned int salary, 
     CurrencyType currency){
     
-    Teacher* s = (Teacher*)malloc(sizeof(Teacher));
-    if (!s) return NULL;
-
-    s->base.firstName = firstName ? strdup(firstName) : strdup("");
-    s->base.secondName = secondName ? strdup(secondName) : strdup("");
-    s->base.lastName = lastName ? strdup(lastName) : strdup("");
-
-    if (!s->base.firstName || !s->base.secondName || !s->base.lastName) {
-        if (s->base.firstName) free(s->base.firstName);
-        if (s->base.secondName) free(s->base.secondName);
-        if (s->base.lastName) free(s->base.lastName);
-        free(s);
+    Teacher* t = (Teacher*)malloc(sizeof(Teacher));
+    if (!t) return NULL;
+    t->base.firstName = firstName ? strdup(firstName) : strdup("");
+    t->base.secondName = secondName ? strdup(secondName) : strdup("");
+    t->base.lastName = lastName ? strdup(lastName) : strdup("");
+    if (!t->base.firstName || !t->base.secondName || !t->base.lastName) {
+        if (t->base.firstName) free(t->base.firstName);
+        if (t->base.secondName) free(t->base.secondName);
+        if (t->base.lastName) free(t->base.lastName);
+        free(t);
         return NULL;
     }
 
-    s->base.dayBirth = dayBirth;
-    s->base.monthBirth = monthBirth;
-    s->base.yearBirth = yearBirth;
-    s->base.id = *id;
-    s->base.type = PERSON_TEACHER;
-    s->base.currency = currency;
-    s->salary = salary;
-    s->base.getPayment = teacherGetPayment;
-    return s;
+    t->base.dayBirth = dayBirth;
+    t->base.monthBirth = monthBirth;
+    t->base.yearBirth = yearBirth;
+    t->base.id = *id;
+    t->base.currency = currency;
+    t->salary = salary;
+    t->base.getPayment = teacherGetPayment;
+    t->base.destroy = teacherDestroy;
+    t->base.comparePassport = teacherComparePassport;
+    t->base.getFullName = teacherGetFullName;
+    t->base.toString = teacherToString;
+    
+    return t;
 }

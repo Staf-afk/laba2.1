@@ -34,17 +34,7 @@ typedef struct{
     unsigned int number;
 } Person_ID;
 
-
-typedef enum {
-    PERSON_STUDENT = 1,
-    PERSON_TEACHER = 2
-} PersonType;
-
-typedef enum {
-    PAYMENT_TYPE_INT,
-    PAYMENT_TYPE_DOUBLE
-} PaymentType;
-
+typedef struct PersonBase PersonBase;
 
 typedef struct PersonBase{
     char* firstName;
@@ -54,9 +44,13 @@ typedef struct PersonBase{
     uint8_t monthBirth;
     uint16_t yearBirth;
     Person_ID id;
-    PersonType type;
     CurrencyType currency;
-    void* (*getPayment)(struct PersonBase* self);
+
+    void* (*getPayment)(PersonBase* self);
+    void (*destroy)(PersonBase* self);
+    int (*comparePassport)(PersonBase* self, Person_ID* id);
+    char* (*getFullName)(PersonBase* self);
+    char* (*toString)(PersonBase* self);
 } PersonBase;
 
 
@@ -76,48 +70,15 @@ typedef struct{
     size_t size;
 } PersonArray;
 
-
-extern PassportFormat g_passportFormat;
-
-
-void setPassportFormat(PassportFormat format);
-
-PassportFormat getPassportFormat(void);
-
-int comparePassportIDs(Person_ID* id1, Person_ID* id2);
-
-void printPassportID(Person_ID* id);
-
-
-
-
-CodeError  initPersonList(PersonArray* arr);
-
-CodeError  addPerson(PersonArray* arr, PersonBase* person);
-
+CodeError initPersonList(PersonArray* arr);
+CodeError addPerson(PersonArray* arr, PersonBase* person);
 CodeError removePerson(PersonArray* arr, size_t index);
-
 void freePersonArray(PersonArray* arr);
-
-void printPerson(PersonBase* p);
-
-void printAllPersons(PersonArray* arr);
-
-
-
 PersonBase* findPersonByID(PersonArray* arr, unsigned int series, unsigned int number);
 
-Student* findStudentByIndex(PersonArray* arr, size_t index);
-
-Teacher* findTeacherByIndex(PersonArray* arr, size_t index);
-
-
-
-int isStudent(PersonBase* p);
-
-int isTeacher(PersonBase* p);
-
 char* currencyToString(CurrencyType currency);
-
+void setPassportFormat(PassportFormat format);
+PassportFormat getPassportFormat(void);
+int comparePassportIDs(Person_ID* id1, Person_ID* id2);
 
 #endif
